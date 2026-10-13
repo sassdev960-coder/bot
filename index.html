@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPT Asistente — Panel Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0d10; --surface: #15161a; --card: #1e1f26;
+      --border: rgba(255,255,255,0.08); --border-hover: rgba(255,255,255,0.18);
+      --accent: #10a37f; --accent-dim: rgba(16,163,127,0.15); --accent-hover: #0d8f6f;
+      --danger: #ef4444; --danger-dim: rgba(239,68,68,0.15);
+      --warning: #f59e0b; --warning-dim: rgba(245,158,11,0.15);
+      --info: #3b82f6; --info-dim: rgba(59,130,246,0.15);
+      --text: #ececf1; --text-muted: #8e8ea0; --text-dim: #565669;
+      --radius: 12px; --radius-sm: 8px;
+    }
+    html, body { height: 100%; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.5; display: flex; flex-direction: column; }
+
+    /* LOGIN */
+    #login-screen { display: flex; align-items: center; justify-content: center; flex: 1; padding: 24px; }
+    .login-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 440px; box-shadow: 0 24px 60px rgba(0,0,0,0.7); }
+    .login-logo { width: 52px; height: 52px; background: linear-gradient(135deg,#10a37f,#0d7a60); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(16,163,127,0.3); }
+    .login-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .login-card .sub { color: var(--text-muted); margin-bottom: 28px; font-size: 13px; }
+
+    /* APP */
+    #app { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+    #app.visible { display: flex; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
+    .topbar-brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .topbar-url { font-size: 11px; color: var(--text-dim); font-family: monospace; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .sidebar-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase; padding: 0 8px; margin: 12px 0 6px; }
+    .sidebar-label:first-child { margin-top: 0; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); font-weight: 500; transition: all 0.15s; border: 1px solid transparent; user-select: none; }
+    .nav-item:hover { background: var(--card); color: var(--text); }
+    .nav-item.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(16,163,127,0.25); }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; }
+
+    /* CONTENT */
+    .content { flex: 1; overflow-y: auto; padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+    .page { display: none; flex-direction: column; gap: 24px; }
+    .page.active { display: flex; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title { font-size: 20px; font-weight: 700; }
+    .page-sub { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+    /* CARDS */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+    /* STATS */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 14px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.15s; }
+    .stat-card:hover { border-color: var(--border-hover); }
+    .stat-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-value { font-size: 28px; font-weight: 800; line-height: 1.1; }
+    .stat-value.green { color: var(--accent); } .stat-value.red { color: var(--danger); }
+    .stat-value.yellow { color: var(--warning); } .stat-value.blue { color: var(--info); }
+    .stat-icon { font-size: 18px; }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: rgba(255,255,255,0.04); color: var(--text-muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 14px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* BADGES */
+    .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .badge.activo, .badge.activa { background: var(--accent-dim); color: var(--accent); }
+    .badge.vencido, .badge.vencida { background: var(--danger-dim); color: var(--danger); }
+    .badge.suspendido { background: var(--warning-dim); color: var(--warning); }
+    .badge.cancelado, .badge.cancelada { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+    .badge.baneada { background: var(--danger-dim); color: var(--danger); }
+    .badge.reserva { background: var(--info-dim); color: var(--info); }
+    .badge.renovada { background: var(--info-dim); color: var(--info); }
+    .badge.revocado { background: var(--danger-dim); color: var(--danger); }
+    .badge.default { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+
+    /* FORMS */
+    .form-grid { display: grid; gap: 14px; }
+    .form-2 { grid-template-columns: 1fr 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .field input, .field select, .field textarea { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; color: var(--text); font-size: 13px; outline: none; transition: border-color 0.15s; font-family: inherit; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+    .field input::placeholder { color: var(--text-dim); }
+    .field select { cursor: pointer; }
+    .field textarea { resize: vertical; min-height: 70px; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: inherit; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-danger { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
+    .btn-success { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(16,163,127,0.3); }
+    .btn-success:hover:not(:disabled) { background: var(--accent); color: #fff; }
+    .btn-info { background: var(--info-dim); color: var(--info); border: 1px solid rgba(59,130,246,0.3); }
+    .btn-info:hover:not(:disabled) { background: var(--info); color: #fff; }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover:not(:disabled) { background: var(--card); color: var(--text); border-color: var(--border-hover); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; backdrop-filter: blur(4px); }
+    .modal-overlay.hidden { display: none; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.7); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 22px; line-height: 1; padding: 2px 6px; border-radius: 6px; transition: all 0.15s; }
+    .modal-close:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    /* ALERTS */
+    .alert-box { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; display: none; margin-top: 12px; }
+    .alert-box.visible { display: block; }
+    .alert-box.error { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+    .alert-box.success { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(16,163,127,0.3); }
+    .alert-box.info { background: var(--info-dim); color: var(--info); border: 1px solid rgba(59,130,246,0.3); }
+
+    /* MISC */
+    .search-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .search-input { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; color: var(--text); font-size: 13px; outline: none; min-width: 200px; transition: border-color 0.15s; font-family: inherit; }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-dim); }
+    .sel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 12px; color: var(--text); font-size: 13px; outline: none; cursor: pointer; font-family: inherit; }
+    .chip { display: inline-flex; align-items: center; padding: 1px 7px; background: rgba(255,255,255,0.06); border-radius: 99px; font-size: 11px; color: var(--text-muted); }
+    .action-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+    .empty-state .icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
+    .empty-state p { font-size: 13px; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .dias-wrap { display: flex; align-items: center; gap: 7px; min-width: 110px; }
+    .dias-pill { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .dias-pill.ok { background: var(--accent-dim); color: var(--accent); }
+    .dias-pill.warn { background: var(--warning-dim); color: var(--warning); }
+    .dias-pill.crit { background: var(--danger-dim); color: var(--danger); }
+    .dias-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; }
+    .dias-bar-fill { height: 100%; border-radius: 99px; }
+    #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 200; pointer-events: none; }
+    .toast { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 10px; animation: slideIn 0.2s ease; max-width: 340px; }
+    .toast.success { border-left: 3px solid var(--accent); }
+    .toast.error { border-left: 3px solid var(--danger); }
+    .toast.info { border-left: 3px solid var(--info); }
+    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .form-2 { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">&#x2699;&#xFE0F;</div>
+    <h1>Panel Admin</h1>
+    <p class="sub">GPT Asistente &mdash; Control de suscripciones y accesos</p>
+    <div class="form-grid" style="margin-bottom:16px;">
+      <div class="field">
+        <label>URL Supabase Functions</label>
+        <input type="url" id="l-url" placeholder="https://xxxx.supabase.co/functions/v1" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Admin Token</label>
+        <input type="text" id="l-token" placeholder="Tu ADMIN_TOKEN"
+               autocomplete="off" data-lpignore="true" data-form-type="other"
+               style="-webkit-text-security:disc;">
+      </div>
+    </div>
+    <div id="l-alert" class="alert-box error"></div>
+    <button class="btn btn-primary" id="l-btn" style="width:100%;justify-content:center;padding:12px;margin-top:8px;">
+      Entrar al panel
+    </button>
+  </div>
+</div>
+
+<!-- ========== APP ========== -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand"><span class="dot"></span>GPT Asistente &mdash; Admin</div>
+    <div class="topbar-right">
+      <span class="topbar-url" id="t-url"></span>
+      <button class="btn btn-ghost btn-sm" id="t-refresh">&#x21BB; Actualizar</button>
+      <button class="btn btn-danger btn-sm" id="t-logout">Salir</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <span class="sidebar-label">Principal</span>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</div>
+      <span class="sidebar-label">Gesti&oacute;n</span>
+      <div class="nav-item" data-page="clientes"><span class="nav-icon">&#x1F465;</span> Clientes <span class="nav-badge" id="badge-v" style="display:none">0</span></div>
+      <div class="nav-item" data-page="cuentas"><span class="nav-icon">&#x1F511;</span> Cuentas Maestras</div>
+      <div class="nav-item" data-page="pagos"><span class="nav-icon">&#x1F4B0;</span> Pagos</div>
+      <span class="sidebar-label">Sistema</span>
+      <div class="nav-item" data-page="logs"><span class="nav-icon">&#x1F4CB;</span> Logs de Acceso</div>
+    </nav>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-ts"></div></div>
+          <div class="action-row">
+            <button class="btn btn-danger btn-sm" onclick="revocarTodos()" title="Revoca el acceso a TODOS los clientes">&#x1F6A8; Revocar todos</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">&#x21BB; Actualizar</button>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-icon">&#x2705;</div><div class="stat-label">Clientes Activos</div><div class="stat-value green" id="s1">&mdash;</div></div>
+          <div class="stat-card"><div class="stat-icon">&#x23F0;</div><div class="stat-label">Clientes Vencidos</div><div class="stat-value red" id="s2">&mdash;</div></div>
+          <div class="stat-card"><div class="stat-icon">&#x26A0;&#xFE0F;</div><div class="stat-label">Suspendidos</div><div class="stat-value yellow" id="s3">&mdash;</div></div>
+          <div class="stat-card"><div class="stat-icon">&#x1F4C5;</div><div class="stat-label">Vencen esta semana</div><div class="stat-value yellow" id="s4">&mdash;</div></div>
+          <div class="stat-card"><div class="stat-icon">&#x1F4B5;</div><div class="stat-label">Ingresos del mes</div><div class="stat-value blue" id="s5">&mdash;</div></div>
+          <div class="stat-card"><div class="stat-icon">&#x1F511;</div><div class="stat-label">Cuentas Activas</div><div class="stat-value green" id="s6">&mdash;</div></div>
+          <div class="stat-card"><div class="stat-icon">&#x1F6AB;</div><div class="stat-label">Cuentas Baneadas</div><div class="stat-value red" id="s7">&mdash;</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">&#x26A0;&#xFE0F; Pr&oacute;ximos a vencer (&le; 5 d&iacute;as) <button class="btn btn-ghost btn-sm" onclick="switchPage('clientes')">Ver todos &rarr;</button></div>
+          <div id="proximos-wrap"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></div>
+        </div>
+      </div>
+
+      <!-- CLIENTES -->
+      <div class="page" id="page-clientes">
+        <div class="page-header">
+          <div><div class="page-title">Clientes</div><div class="page-sub" id="clientes-ct"></div></div>
+          <div class="action-row">
+            <button class="btn btn-ghost btn-sm" onclick="loadClientes()">&#x21BB;</button>
+            <button class="btn btn-primary" onclick="openModal('m-new-c')">+ Nuevo cliente</button>
+          </div>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div class="search-bar">
+            <input class="search-input" type="text" id="q-cli" placeholder="Buscar usuario, nombre, email...">
+            <select class="sel" id="f-est-cli">
+              <option value="">Todos los estados</option>
+              <option value="activo">Activos</option>
+              <option value="vencido">Vencidos</option>
+              <option value="suspendido">Suspendidos</option>
+              <option value="cancelado">Cancelados</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Usuario</th><th>Nombre</th><th>Estado</th><th>Suscripci&oacute;n</th><th>Vencimiento</th><th>D&iacute;as</th><th>Cuenta Maestra</th><th>Acciones</th></tr></thead>
+              <tbody id="cli-tb"><tr><td colspan="9"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUENTAS MAESTRAS -->
+      <div class="page" id="page-cuentas">
+        <div class="page-header">
+          <div><div class="page-title">Cuentas Maestras</div><div class="page-sub">Credenciales compartidas de ChatGPT</div></div>
+          <div class="action-row">
+            <button class="btn btn-ghost btn-sm" onclick="loadCuentas()">&#x21BB;</button>
+            <button class="btn btn-primary" onclick="openModal('m-new-cm')">+ Nueva cuenta</button>
+          </div>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Producto</th><th>Email</th><th>Estado</th><th>TOTP</th><th>Alta</th><th>&Uacute;lt. verif.</th><th>OK?</th><th>Notas</th><th>Acciones</th></tr></thead>
+              <tbody id="cm-tb"><tr><td colspan="10"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGOS -->
+      <div class="page" id="page-pagos">
+        <div class="page-header">
+          <div><div class="page-title">Historial de Pagos</div><div class="page-sub">&Uacute;ltimos 100 pagos</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="loadPagos()">&#x21BB;</button>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Moneda</th><th>M&eacute;todo</th><th>Referencia</th><th>Fecha</th><th>Notas</th></tr></thead>
+              <tbody id="pag-tb"><tr><td colspan="8"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGS -->
+      <div class="page" id="page-logs">
+        <div class="page-header">
+          <div><div class="page-title">Logs de Acceso</div><div class="page-sub">Actividad reciente de clientes</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="loadLogs()">&#x21BB;</button>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div class="search-bar">
+            <input class="search-input" type="text" id="q-log" placeholder="Buscar acci&oacute;n, IP...">
+            <select class="sel" id="f-res">
+              <option value="">Todos</option>
+              <option value="exitoso">Exitosos</option>
+              <option value="fallido">Fallidos</option>
+              <option value="bloqueado">Bloqueados</option>
+              <option value="revocacion">Revocaciones</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Cliente</th><th>Acci&oacute;n</th><th>Resultado</th><th>IP</th><th>Fecha</th></tr></thead>
+              <tbody id="log-tb"><tr><td colspan="6"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ========== MODALS ========== -->
+
+<!-- Nuevo Cliente -->
+<div class="modal-overlay hidden" id="m-new-c">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Nuevo Cliente</div><button class="modal-close" onclick="closeModal('m-new-c')">&#x00D7;</button></div>
+    <div class="form-grid">
+      <div class="form-grid form-2" style="display:grid;">
+        <div class="field"><label>Usuario *</label><input type="text" id="nc-u" placeholder="ej: juan123" autocomplete="off"></div>
+        <div class="field"><label>Contrase&ntilde;a *</label><input type="text" id="nc-p" placeholder="Contrase&ntilde;a de acceso" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
+      </div>
+      <div class="form-grid form-2" style="display:grid;">
+        <div class="field"><label>Nombre completo</label><input type="text" id="nc-n" placeholder="Juan P&eacute;rez" autocomplete="off"></div>
+        <div class="field"><label>Email</label><input type="email" id="nc-e" placeholder="juan@ejemplo.com" autocomplete="off"></div>
+      </div>
+      <div class="field"><label>D&iacute;as de suscripci&oacute;n</label><input type="number" id="nc-d" value="30" min="1" max="365"></div>
+    </div>
+    <div id="nc-alert" class="alert-box error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-new-c')">Cancelar</button>
+      <button class="btn btn-primary" id="nc-btn" onclick="crearCliente()">Crear cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Renovar -->
+<div class="modal-overlay hidden" id="m-ren">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Renovar Suscripci&oacute;n</div><button class="modal-close" onclick="closeModal('m-ren')">&#x00D7;</button></div>
+    <div id="ren-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></div>
+    <div class="form-grid">
+      <div class="form-grid form-2" style="display:grid;">
+        <div class="field"><label>D&iacute;as a agregar</label><input type="number" id="ren-d" value="30" min="1" max="365"></div>
+        <div class="field"><label>Monto (BOB)</label><input type="number" id="ren-m" value="0" min="0" step="0.01"></div>
+      </div>
+      <div class="form-grid form-2" style="display:grid;">
+        <div class="field"><label>M&eacute;todo de pago</label>
+          <select id="ren-met"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option><option value="qr">QR</option><option value="otro">Otro</option></select>
+        </div>
+        <div class="field"><label>Referencia</label><input type="text" id="ren-ref" placeholder="Opcional" autocomplete="off"></div>
+      </div>
+    </div>
+    <div id="ren-alert" class="alert-box error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-ren')">Cancelar</button>
+      <button class="btn btn-primary" id="ren-btn" onclick="doRenovar()">Renovar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmar Suspender -->
+<div class="modal-overlay hidden" id="m-sus">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header"><div class="modal-title">&#x26A0;&#xFE0F; Suspender cliente</div><button class="modal-close" onclick="closeModal('m-sus')">&#x00D7;</button></div>
+    <p id="sus-info" style="color:var(--text-muted);font-size:13px;margin-bottom:10px;"></p>
+    <p style="color:var(--danger);font-size:13px;">El cliente perder&aacute; acceso en la pr&oacute;xima verificaci&oacute;n (m&aacute;x. 15 min).</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-sus')">Cancelar</button>
+      <button class="btn btn-danger" id="sus-btn" onclick="doSuspender()">Suspender</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmar Revocar -->
+<div class="modal-overlay hidden" id="m-rev">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header"><div class="modal-title">&#x1F512; Revocar acceso</div><button class="modal-close" onclick="closeModal('m-rev')">&#x00D7;</button></div>
+    <p id="rev-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;"></p>
+    <p style="color:var(--danger);font-size:13px;line-height:1.6;">
+      El cliente ser&aacute; expulsado <strong>inmediatamente</strong> de ChatGPT.
+      Su sesi&oacute;n se cerrar&aacute; en segundos si est&aacute; activo, o en m&aacute;ximo 15 min.
+      <br><br>
+      <strong>Podr&aacute; volver a entrar</strong> con sus credenciales (a menos que tambi&eacute;n lo suspendas).
+    </p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-rev')">Cancelar</button>
+      <button class="btn btn-danger" id="rev-btn" onclick="doRevocar()">&#x1F512; Revocar ahora</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nueva Cuenta Maestra -->
+<div class="modal-overlay hidden" id="m-new-cm">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Nueva Cuenta Maestra</div><button class="modal-close" onclick="closeModal('m-new-cm')">&#x00D7;</button></div>
+    <div class="form-grid">
+      <div class="field"><label>Producto</label>
+        <select id="cm-prod"><option value="chatgpt">ChatGPT</option><option value="gemini">Gemini</option><option value="codex">Codex</option><option value="otro">Otro</option></select>
+      </div>
+      <div class="field"><label>Email de la cuenta *</label><input type="email" id="cm-e" placeholder="cuenta@openai.com" autocomplete="off"></div>
+      <div class="field"><label>Contrase&ntilde;a de la cuenta *</label><input type="text" id="cm-p" placeholder="Contrase&ntilde;a de ChatGPT" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
+      <div class="field"><label>TOTP Seed (2FA) &mdash; opcional</label><input type="text" id="cm-t" placeholder="Base32 seed del autenticador" autocomplete="off"></div>
+      <div class="field"><label>Notas</label><textarea id="cm-n" placeholder="Observaciones..."></textarea></div>
+    </div>
+    <div id="cm-alert" class="alert-box error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-new-cm')">Cancelar</button>
+      <button class="btn btn-primary" id="cm-btn" onclick="crearCuenta()">Crear cuenta</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+'use strict';
+var API = '', TOK = '', PENDING = null, PENDING_REV = null;
+
+/* ── HELPERS ── */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function fmtD(s){ if(!s)return'&mdash;'; var d=new Date(s); return isNaN(d)?esc(s):d.toLocaleDateString('es-BO',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDT(s){ if(!s)return'&mdash;'; var d=new Date(s); return isNaN(d)?esc(s):d.toLocaleString('es-BO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+
+function badge(v){
+  var c=(v||'').toLowerCase().replace(/[^a-z]/g,'');
+  var L={activo:'Activo',activa:'Activa',vencido:'Vencido',vencida:'Vencida',suspendido:'Suspendido',cancelado:'Cancelado',cancelada:'Cancelada',baneada:'Baneada',reserva:'Reserva',renovada:'Renovada',revocado:'Revocado'};
+  return '<span class="badge '+c+'">'+(L[c]||esc(v)||'&mdash;')+'</span>';
+}
+
+function diasPill(n){
+  n=Number(n);
+  var cls=n<=0?'crit':n<=5?'warn':'ok';
+  var lbl=n<=0?'Vencido':n+'d';
+  var pct=Math.max(0,Math.min(100,(n/30)*100));
+  var col=n<=0?'var(--danger)':n<=5?'var(--warning)':'var(--accent)';
+  return '<div class="dias-wrap"><span class="dias-pill '+cls+'">'+lbl+'</span><div class="dias-bar"><div class="dias-bar-fill" style="width:'+pct+'%;background:'+col+';"></div></div></div>';
+}
+
+function toast(msg,type){
+  type=type||'success';
+  var el=document.createElement('div');
+  el.className='toast '+type;
+  var ico=type==='success'?'&#x2705;':type==='error'?'&#x274C;':'&#x2139;&#xFE0F;';
+  el.innerHTML='<span>'+ico+'</span><span>'+msg+'</span>';
+  $('toast-container').appendChild(el);
+  setTimeout(function(){ el.remove(); },3500);
+}
+
+function showA(id,msg,type){
+  var el=$(id); if(!el)return;
+  el.textContent=msg; el.className='alert-box '+(type||'error')+' visible';
+}
+function hideA(id){ var el=$(id); if(el){el.className='alert-box';el.textContent='';} }
+
+async function api(accion,method,body){
+  method=method||'GET';
+  var opts={method:method,headers:{'Authorization':'Bearer '+TOK,'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  var res=await fetch(API+'/admin?accion='+accion,opts);
+  var data=await res.json();
+  if(!data.success&&data.mensaje)throw new Error(data.mensaje);
+  return data;
+}
+
+/* ── AUTH ── */
+$('l-btn').addEventListener('click',async function(){
+  var url=$('l-url').value.trim().replace(/\/$/,'');
+  var tok=$('l-token').value.trim();
+  if(!url||!tok){showA('l-alert','Completa la URL y el token.');return;}
+  var btn=$('l-btn'); btn.disabled=true; btn.innerHTML='<div class="spinner"></div>&nbsp;Verificando...';
+  hideA('l-alert'); API=url; TOK=tok;
+  try{
+    await api('dashboard');
+    localStorage.setItem('gptAdminUrl',url);
+    $('t-url').textContent=url;
+    $('login-screen').style.display='none';
+    $('app').classList.add('visible');
+    loadAll();
+  }catch(e){showA('l-alert','No se pudo conectar: '+e.message); API=''; TOK='';}
+  finally{btn.disabled=false; btn.textContent='Entrar al panel';}
+});
+$('l-token').addEventListener('keyup',function(e){ if(e.key==='Enter')$('l-btn').click(); });
+$('t-logout').addEventListener('click',function(){ localStorage.removeItem('gptAdminUrl'); location.reload(); });
+$('t-refresh').addEventListener('click',loadAll);
+window.addEventListener('DOMContentLoaded',function(){ var u=localStorage.getItem('gptAdminUrl'); if(u)$('l-url').value=u; });
+
+/* ── NAV ── */
+function switchPage(name){
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var ni=document.querySelector('.nav-item[data-page="'+name+'"]');
+  if(ni)ni.classList.add('active');
+  var pg=$('page-'+name);
+  if(pg)pg.classList.add('active');
+  if(name==='clientes')loadClientes();
+  if(name==='cuentas')loadCuentas();
+  if(name==='pagos')loadPagos();
+  if(name==='logs')loadLogs();
+}
+document.querySelectorAll('.nav-item').forEach(function(i){
+  i.addEventListener('click',function(){switchPage(i.dataset.page);});
+});
+
+/* ── MODALS ── */
+function openModal(id){ var m=$(id); if(m)m.classList.remove('hidden'); }
+function closeModal(id){ var m=$(id); if(m)m.classList.add('hidden'); }
+document.querySelectorAll('.modal-overlay').forEach(function(m){
+  m.addEventListener('click',function(e){ if(e.target===m)closeModal(m.id); });
+});
+
+/* ── LOAD ALL ── */
+function loadAll(){ loadDashboard(); }
+
+/* ── DASHBOARD ── */
+async function loadDashboard(){
+  try{
+    var r=await api('dashboard');
+    var d=r.dashboard||{};
+    $('s1').textContent=d.clientes_activos!=null?d.clientes_activos:'&mdash;';
+    $('s2').textContent=d.clientes_vencidos!=null?d.clientes_vencidos:'&mdash;';
+    $('s3').textContent=d.clientes_suspendidos!=null?d.clientes_suspendidos:'&mdash;';
+    $('s4').textContent=d.vencen_esta_semana!=null?d.vencen_esta_semana:'&mdash;';
+    $('s5').textContent=d.ingresos_mes_actual!=null?'Bs '+Number(d.ingresos_mes_actual).toFixed(2):'&mdash;';
+    $('s6').textContent=d.cuentas_activas!=null?d.cuentas_activas:'&mdash;';
+    $('s7').textContent=d.cuentas_baneadas!=null?d.cuentas_baneadas:'&mdash;';
+    $('dash-ts').textContent='Actualizado: '+new Date().toLocaleTimeString('es-BO');
+    var bv=$('badge-v'), nv=Number(d.clientes_vencidos||0);
+    bv.textContent=nv; bv.style.display=nv>0?'inline-flex':'none';
+  }catch(e){ toast('Error dashboard: '+e.message,'error'); }
+
+  try{
+    var r2=await api('listar_clientes');
+    var prx=(r2.clientes||[]).filter(function(c){ var n=Number(c.dias_restantes); return n>=0&&n<=5&&c.estado_cliente==='activo'; })
+      .sort(function(a,b){return Number(a.dias_restantes)-Number(b.dias_restantes);});
+    var wrap=$('proximos-wrap');
+    if(!prx.length){
+      wrap.innerHTML='<div class="empty-state"><div class="icon">&#x1F389;</div><p>Ning&uacute;n cliente vence en los pr&oacute;ximos 5 d&iacute;as</p></div>';
+    }else{
+      wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>D&iacute;as</th><th>Vencimiento</th><th>Acci&oacute;n</th></tr></thead><tbody>'+
+        prx.map(function(c){
+          return '<tr><td><strong>'+esc(c.usuario)+'</strong></td><td>'+esc(c.nombre_completo||'&mdash;')+'</td><td>'+diasPill(c.dias_restantes)+'</td><td>'+fmtD(c.fecha_vencimiento)+'</td>'+
+            '<td><button class="btn btn-success btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')">&#x21BB; Renovar</button></td></tr>';
+        }).join('')+'</tbody></table></div>';
+    }
+  }catch(e){}
+}
+
+/* ── CLIENTES ── */
+var ALL_CLI=[];
+
+async function loadClientes(){
+  $('cli-tb').innerHTML='<tr><td colspan="9"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  try{
+    var r=await api('listar_clientes');
+    ALL_CLI=r.clientes||[];
+    $('clientes-ct').textContent=ALL_CLI.length+' registros';
+    renderCli();
+  }catch(e){ toast('Error clientes: '+e.message,'error'); }
+}
+
+function renderCli(){
+  var q=$('q-cli').value.toLowerCase();
+  var ef=$('f-est-cli').value;
+  var f=ALL_CLI.filter(function(c){
+    var mq=!q||(c.usuario||'').toLowerCase().includes(q)||(c.nombre_completo||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q);
+    var me=!ef||(c.estado_cliente||'')===ef;
+    return mq&&me;
+  });
+  if(!f.length){ $('cli-tb').innerHTML='<tr><td colspan="9"><div class="empty-state"><div class="icon">&#x1F50D;</div><p>Sin resultados</p></div></td></tr>'; return; }
+  $('cli-tb').innerHTML=f.map(function(c){
+    var est=(c.estado_cliente||'activo').toLowerCase();
+    var canSus=est==='activo'||est==='vencido';
+    var canRea=est==='suspendido'||est==='vencido'||est==='cancelado';
+    var canRev=est!=='cancelado';
+    return '<tr>'+
+      '<td><span class="chip">#'+c.id+'</span></td>'+
+      '<td><strong>'+esc(c.usuario)+'</strong></td>'+
+      '<td>'+esc(c.nombre_completo||'&mdash;')+'</td>'+
+      '<td>'+badge(c.estado_cliente)+'</td>'+
+      '<td>'+badge(c.estado_suscripcion)+' <span class="chip" style="margin-left:4px;">'+esc(c.producto||'chatgpt')+'</span></td>'+
+      '<td>'+fmtD(c.fecha_vencimiento)+'</td>'+
+      '<td>'+diasPill(c.dias_restantes)+'</td>'+
+      '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.cuenta_maestra_email||'&mdash;')+'</span></td>'+
+      '<td><div class="action-row">'+
+        '<button class="btn btn-info btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')" title="Renovar">&#x21BB;</button>'+
+        (canSus?'<button class="btn btn-danger btn-sm" onclick="abrirSuspender('+c.id+',\''+esc(c.usuario)+'\')" title="Suspender licencia">Suspender</button>':'')+
+        (canRev?'<button class="btn btn-danger btn-sm" onclick="abrirRevocar('+c.id+',\''+esc(c.usuario)+'\')" title="Forzar cierre de sesión inmediato" style="background:rgba(239,68,68,0.3);">&#x1F512; Revocar</button>':'')+
+        (canRea?'<button class="btn btn-success btn-sm" onclick="doReactivar('+c.id+',\''+esc(c.usuario)+'\')">Reactivar</button>':'')+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+$('q-cli').addEventListener('input',renderCli);
+$('f-est-cli').addEventListener('change',renderCli);
+
+/* ── CREAR CLIENTE ── */
+async function crearCliente(){
+  var u=$('nc-u').value.trim(), p=$('nc-p').value.trim(), n=$('nc-n').value.trim(), e=$('nc-e').value.trim(), d=parseInt($('nc-d').value)||30;
+  if(!u||!p){showA('nc-alert','Usuario y contrase\u00f1a son obligatorios.');return;}
+  var btn=$('nc-btn'); btn.disabled=true; btn.textContent='Creando...'; hideA('nc-alert');
+  try{
+    await api('crear_cliente','POST',{usuario:u,password:p,email:e,nombre_completo:n,dias:d});
+    closeModal('m-new-c');
+    toast('Cliente "'+u+'" creado con '+d+' d\u00edas');
+    $('nc-u').value=''; $('nc-p').value=''; $('nc-n').value=''; $('nc-e').value=''; $('nc-d').value='30';
+    loadClientes(); loadDashboard();
+  }catch(e){showA('nc-alert',e.message);}
+  finally{btn.disabled=false; btn.textContent='Crear cliente';}
+}
+
+/* ── RENOVAR ── */
+function abrirRenovar(id,usuario){
+  PENDING={id:id,usuario:usuario};
+  $('ren-info').innerHTML='<strong>'+esc(usuario)+'</strong> &nbsp;<span class="chip">#'+id+'</span>';
+  hideA('ren-alert'); openModal('m-ren');
+}
+async function doRenovar(){
+  if(!PENDING)return;
+  var d=parseInt($('ren-d').value)||30, m=parseFloat($('ren-m').value)||0;
+  var met=$('ren-met').value, ref=$('ren-ref').value.trim();
+  var btn=$('ren-btn'); btn.disabled=true; btn.textContent='Renovando...'; hideA('ren-alert');
+  try{
+    await api('renovar','POST',{cliente_id:PENDING.id,dias:d,monto:m,metodo:met,referencia:ref||null});
+    closeModal('m-ren');
+    toast('Suscripci\u00f3n de "'+PENDING.usuario+'" renovada por '+d+' d\u00edas');
+    loadClientes(); loadDashboard();
+  }catch(e){showA('ren-alert',e.message);}
+  finally{btn.disabled=false; btn.textContent='Renovar';}
+}
+
+/* ── SUSPENDER ── */
+function abrirSuspender(id,usuario){
+  PENDING={id:id,usuario:usuario};
+  $('sus-info').innerHTML='\u00bfDeseas suspender a <strong>'+esc(usuario)+'</strong> (ID: '+id+')?';
+  openModal('m-sus');
+}
+async function doSuspender(){
+  if(!PENDING)return;
+  var btn=$('sus-btn'); btn.disabled=true; btn.textContent='Suspendiendo...';
+  try{
+    await api('suspender','POST',{cliente_id:PENDING.id});
+    closeModal('m-sus');
+    toast('Cliente "'+PENDING.usuario+'" suspendido','info');
+    loadClientes(); loadDashboard();
+  }catch(e){toast('Error: '+e.message,'error');}
+  finally{btn.disabled=false; btn.textContent='Suspender';}
+}
+
+/* ── REVOCAR ACCESO ── */
+function abrirRevocar(id,usuario){
+  PENDING_REV={id:id,usuario:usuario};
+  $('rev-info').innerHTML='\u00bfForzar el cierre de sesi\u00f3n de <strong>'+esc(usuario)+'</strong> (ID: '+id+')?';
+  openModal('m-rev');
+}
+async function doRevocar(){
+  if(!PENDING_REV)return;
+  var btn=$('rev-btn'); btn.disabled=true; btn.textContent='Revocando...';
+  try{
+    await api('revocar_acceso','POST',{cliente_id:PENDING_REV.id});
+    closeModal('m-rev');
+    toast('\uD83D\uDD12 Acceso de "'+PENDING_REV.usuario+'" revocado. Se cerrar\u00e1 en \u226415 min.','info');
+    loadClientes(); loadDashboard();
+  }catch(e){toast('Error al revocar: '+e.message,'error');}
+  finally{btn.disabled=false; btn.innerHTML='&#x1F512; Revocar ahora';}
+}
+
+/* ── REVOCAR TODOS (emergencia) ── */
+async function revocarTodos(){
+  var txt=prompt('\u26A0\uFE0F\u26A0\uFE0F\u26A0\uFE0F Esto cerrar\u00e1 la sesi\u00f3n de TODOS los clientes.\n\nEscribe REVOCAR para confirmar:');
+  if(txt!=='REVOCAR'){ toast('Cancelado.','info'); return; }
+  try{
+    var r=await api('revocar_todos','POST',{});
+    toast('\uD83D\uDD12 Revocaci\u00f3n masiva enviada a '+(r.afectados||0)+' clientes','info');
+  }catch(e){
+    toast('Error: '+e.message,'error');
+  }
+}
+
+/* ── REACTIVAR ── */
+async function doReactivar(id,usuario){
+  if(!confirm('\u00bfReactivar al cliente "'+usuario+'"?'))return;
+  try{
+    await api('reactivar','POST',{cliente_id:id});
+    toast('Cliente "'+usuario+'" reactivado');
+    loadClientes(); loadDashboard();
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+/* ── CUENTAS MAESTRAS ── */
+async function loadCuentas(){
+  $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  try{
+    var r=await api('listar_cuentas');
+    var cuentas=r.cuentas||[];
+    if(!cuentas.length){ $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon">&#x1F511;</div><p>No hay cuentas maestras</p></div></td></tr>'; return; }
+    $('cm-tb').innerHTML=cuentas.map(function(c){
+      return '<tr>'+
+        '<td><span class="chip">#'+c.id+'</span></td>'+
+        '<td><span class="chip">'+esc(c.producto||'chatgpt')+'</span></td>'+
+        '<td>'+esc(c.email)+'</td>'+
+        '<td>'+badge(c.estado)+'</td>'+
+        '<td>'+(c.totp_seed?'<span style="color:var(--accent);">&#x2705;</span>':'<span style="color:var(--text-dim);">&mdash;</span>')+'</td>'+
+        '<td>'+fmtD(c.fecha_alta)+'</td>'+
+        '<td>'+fmtDT(c.ultima_verificacion)+'</td>'+
+        '<td>'+(c.verificacion_ok===false?'<span style="color:var(--danger);">&#x274C;</span>':'<span style="color:var(--accent);">&#x2713;</span>')+'</td>'+
+        '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.notas||'&mdash;')+'</span></td>'+
+        '<td><div class="action-row">'+
+          (c.estado==='activa'
+            ?'<button class="btn btn-danger btn-sm" onclick="estadoCuenta('+c.id+',\'baneada\')">Banear</button>'
+            :'<button class="btn btn-success btn-sm" onclick="estadoCuenta('+c.id+',\'activa\')">Activar</button>')+
+        '</div></td>'+
+      '</tr>';
+    }).join('');
+  }catch(e){ toast('Error cuentas: '+e.message,'error'); }
+}
+
+function estadoCuenta(id,nuevoEstado){
+  var acc=nuevoEstado==='baneada'?'banear':'activar';
+  if(!confirm('\u00bfDeseas '+acc+' esta cuenta maestra?'))return;
+  toast('Requiere agregar acci\u00f3n "cambiar_estado_cuenta" a la Edge Function admin.','info');
+}
+
+async function crearCuenta(){
+  var prod=$('cm-prod').value, e=$('cm-e').value.trim(), p=$('cm-p').value.trim(), t=$('cm-t').value.trim(), n=$('cm-n').value.trim();
+  if(!e||!p){showA('cm-alert','Email y contrase\u00f1a son obligatorios.');return;}
+  var btn=$('cm-btn'); btn.disabled=true; btn.textContent='Creando...'; hideA('cm-alert');
+  try{
+    await api('crear_cuenta','POST',{producto:prod,email:e,password:p,totp_seed:t||null,notas:n||null});
+    closeModal('m-new-cm');
+    toast('Cuenta maestra "'+e+'" creada');
+    $('cm-e').value=''; $('cm-p').value=''; $('cm-t').value=''; $('cm-n').value='';
+    loadCuentas(); loadDashboard();
+  }catch(e){showA('cm-alert',e.message);}
+  finally{btn.disabled=false; btn.textContent='Crear cuenta';}
+}
+
+/* ── PAGOS ── */
+async function loadPagos(){
+  $('pag-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  try{
+    var r=await api('listar_pagos');
+    var pagos=r.pagos||[];
+    if(!pagos.length){ $('pag-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">&#x1F4B0;</div><p>No hay pagos registrados</p></div></td></tr>'; return; }
+    $('pag-tb').innerHTML=pagos.map(function(p){
+      return '<tr>'+
+        '<td><span class="chip">#'+p.id+'</span></td>'+
+        '<td><strong>'+esc((p.clientes&&p.clientes.usuario)||String(p.cliente_id)||'&mdash;')+'</strong></td>'+
+        '<td><strong style="color:var(--accent);">'+Number(p.monto||0).toFixed(2)+'</strong></td>'+
+        '<td><span class="chip">'+esc(p.moneda||'BOB')+'</span></td>'+
+        '<td><span class="badge default">'+esc(p.metodo||'&mdash;')+'</span></td>'+
+        '<td><span style="font-size:12px;color:var(--text-muted);">'+esc(p.referencia||'&mdash;')+'</span></td>'+
+        '<td>'+fmtDT(p.fecha_pago)+'</td>'+
+        '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(p.notas||'&mdash;')+'</span></td>'+
+      '</tr>';
+    }).join('');
+  }catch(e){ toast('Error pagos: '+e.message,'error'); }
+}
+
+/* ── LOGS ── */
+var ALL_LOG=[];
+async function loadLogs(){
+  $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  try{
+    var r=await api('listar_logs');
+    ALL_LOG=r.logs||[];
+    renderLogs();
+  }catch(e){
+    $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x1F4CB;</div><p style="color:var(--text-muted);">Agrega la acci\u00f3n <code>listar_logs</code> a la Edge Function admin para ver los logs.</p></div></td></tr>';
+  }
+}
+function renderLogs(){
+  var q=$('q-log').value.toLowerCase(), rf=$('f-res').value;
+  var f=ALL_LOG.filter(function(l){
+    var mq=!q||(l.accion||'').toLowerCase().includes(q)||(l.ip||'').toLowerCase().includes(q)||String(l.cliente_id||'').includes(q);
+    var mr=!rf||l.resultado===rf||(rf==='revocacion'&&l.accion==='revocacion');
+    return mq&&mr;
+  });
+  if(!f.length){ $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x1F50D;</div><p>Sin resultados</p></div></td></tr>'; return; }
+  var cols={exitoso:'var(--accent)',fallido:'var(--danger)',bloqueado:'var(--warning)',masiva:'var(--info)',otro_dispositivo:'var(--warning)'};
+  $('log-tb').innerHTML=f.map(function(l){
+    return '<tr>'+
+      '<td><span class="chip">#'+l.id+'</span></td>'+
+      '<td>'+(l.cliente_id?'<span class="chip">#'+l.cliente_id+'</span>':'&mdash;')+'</td>'+
+      '<td>'+esc(l.accion||'&mdash;')+'</td>'+
+      '<td><span style="color:'+(cols[l.resultado]||'var(--text-muted)')+';font-weight:600;">'+esc(l.resultado||'&mdash;')+'</span></td>'+
+      '<td><span style="font-family:monospace;font-size:11px;">'+esc(l.ip||'&mdash;')+'</span></td>'+
+      '<td>'+fmtDT(l.fecha)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+$('q-log').addEventListener('input',renderLogs);
+$('f-res').addEventListener('change',renderLogs);
+</script>
+</body>
+</html>
