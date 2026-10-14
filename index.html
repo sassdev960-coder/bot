@@ -22,7 +22,7 @@
     /* LOGIN */
     #login-screen { display: flex; align-items: center; justify-content: center; flex: 1; padding: 24px; }
     .login-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 440px; box-shadow: 0 24px 60px rgba(0,0,0,0.7); }
-    .login-logo { width: 52px; height: 52px; background: linear-gradient(135deg,#10a37f,#0d7a60); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(16,163,127,0.3); }
+    .login-logo { width: 52px; height: 52px; background: linear-gradient(135deg,#10a37f,#0d7a60); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #fff; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(16,163,127,0.3); }
     .login-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
     .login-card .sub { color: var(--text-muted); margin-bottom: 28px; font-size: 13px; }
 
@@ -43,7 +43,7 @@
     .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); font-weight: 500; transition: all 0.15s; border: 1px solid transparent; user-select: none; }
     .nav-item:hover { background: var(--card); color: var(--text); }
     .nav-item.active { background: var(--accent-dim); color: var(--accent); border-color: rgba(16,163,127,0.25); }
-    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .nav-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 99px; }
 
     /* CONTENT */
@@ -54,9 +54,48 @@
     .page-title { font-size: 20px; font-weight: 700; }
     .page-sub { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
 
+    /* BANNER DE PROGRESO DE MIGRACIÓN MASIVA */
+    .migration-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(16,163,127,0.1));
+      border: 1px solid rgba(59,130,246,0.35);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .migration-banner.visible { display: flex; }
+    .migration-banner-icon {
+      width: 40px; height: 40px;
+      background: rgba(59,130,246,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #60a5fa;
+      flex-shrink: 0;
+    }
+    .migration-banner-content { flex: 1; min-width: 200px; }
+    .migration-banner-title { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 3px; }
+    .migration-banner-sub { font-size: 12px; color: #93c5fd; }
+    .migration-banner-progress {
+      flex-basis: 100%;
+      height: 4px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .migration-banner-progress > div {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10a37f);
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+
     /* CARDS */
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
     .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .card-title-icon { display: inline-flex; align-items: center; gap: 8px; }
 
     /* STATS */
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 14px; }
@@ -66,7 +105,7 @@
     .stat-value { font-size: 28px; font-weight: 800; line-height: 1.1; }
     .stat-value.green { color: var(--accent); } .stat-value.red { color: var(--danger); }
     .stat-value.yellow { color: var(--warning); } .stat-value.blue { color: var(--info); }
-    .stat-icon { font-size: 18px; }
+    .stat-icon { color: var(--text-muted); }
 
     /* TABLE */
     .table-wrap { overflow-x: auto; }
@@ -75,6 +114,52 @@
     td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(255,255,255,0.02); }
+    tr.selected td { background: rgba(59,130,246,0.08); }
+
+    /* CHECKBOX */
+    .checkbox-wrap { display: flex; align-items: center; justify-content: center; }
+    .checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border: 1.5px solid var(--border-hover);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s;
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .checkbox:hover { border-color: var(--info); }
+    .checkbox:checked {
+      background: var(--info);
+      border-color: var(--info);
+    }
+    .checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 4px; top: 1px;
+      width: 5px; height: 9px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* BULK TOOLBAR */
+    .bulk-toolbar {
+      display: none;
+      background: var(--info-dim);
+      border: 1px solid rgba(59,130,246,0.35);
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      margin-bottom: 14px;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .bulk-toolbar.visible { display: flex; }
+    .bulk-count { font-weight: 600; font-size: 13px; color: #93c5fd; }
+    .bulk-toolbar .btn { padding: 6px 12px; font-size: 12px; }
 
     /* BADGES */
     .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; white-space: nowrap; }
@@ -101,8 +186,9 @@
     .field textarea { resize: vertical; min-height: 70px; }
 
     /* BUTTONS */
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: inherit; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: inherit; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn svg { flex-shrink: 0; }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
     .btn-danger { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
@@ -111,19 +197,23 @@
     .btn-success:hover:not(:disabled) { background: var(--accent); color: #fff; }
     .btn-info { background: var(--info-dim); color: var(--info); border: 1px solid rgba(59,130,246,0.3); }
     .btn-info:hover:not(:disabled) { background: var(--info); color: #fff; }
-    .btn-migrate { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+    .btn-warning { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
+    .btn-warning:hover:not(:disabled) { background: var(--warning); color: #fff; }
+    .btn-migrate { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
     .btn-migrate:hover:not(:disabled) { background: var(--info); color: #fff; border-color: var(--info); }
     .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
     .btn-ghost:hover:not(:disabled) { background: var(--card); color: var(--text); border-color: var(--border-hover); }
     .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-icon { padding: 6px; width: 30px; height: 30px; }
+    .btn-icon.btn-sm { width: 26px; height: 26px; padding: 4px; }
 
     /* MODAL */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 24px; backdrop-filter: blur(4px); }
     .modal-overlay.hidden { display: none; }
     .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.7); }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .modal-title { font-size: 16px; font-weight: 700; }
-    .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 22px; line-height: 1; padding: 2px 6px; border-radius: 6px; transition: all 0.15s; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+    .modal-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 6px; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
     .modal-close:hover { background: rgba(255,255,255,0.08); color: var(--text); }
     .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
@@ -133,6 +223,7 @@
     .alert-box.error { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
     .alert-box.success { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(16,163,127,0.3); }
     .alert-box.info { background: var(--info-dim); color: var(--info); border: 1px solid rgba(59,130,246,0.3); }
+    .alert-box.warning { background: var(--warning-dim); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); }
 
     /* MISC */
     .search-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -143,9 +234,9 @@
     .chip { display: inline-flex; align-items: center; padding: 1px 7px; background: rgba(255,255,255,0.06); border-radius: 99px; font-size: 11px; color: var(--text-muted); }
     .action-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); }
-    .empty-state .icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
+    .empty-state .icon { margin-bottom: 10px; opacity: 0.4; display: flex; justify-content: center; }
     .empty-state p { font-size: 13px; }
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .dias-wrap { display: flex; align-items: center; gap: 7px; min-width: 110px; }
     .dias-pill { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 99px; font-size: 11px; font-weight: 700; }
@@ -159,7 +250,16 @@
     .toast.success { border-left: 3px solid var(--accent); }
     .toast.error { border-left: 3px solid var(--danger); }
     .toast.info { border-left: 3px solid var(--info); }
+    .toast.warning { border-left: 3px solid var(--warning); }
+    .toast svg { flex-shrink: 0; }
     @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .batch-preview { background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 14px; font-size: 13px; line-height: 1.7; }
+    .batch-preview-row { display: flex; justify-content: space-between; gap: 12px; }
+    .batch-preview-row span:first-child { color: var(--text-muted); }
+    .batch-preview-row span:last-child { font-weight: 600; color: #fff; }
+    .batch-preview-total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; }
+
     @media (max-width: 768px) { .sidebar { display: none; } .form-2 { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
@@ -168,9 +268,13 @@
 <!-- ========== LOGIN ========== -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo">&#x2699;&#xFE0F;</div>
+    <div class="login-logo">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/>
+      </svg>
+    </div>
     <h1>Panel Admin</h1>
-    <p class="sub">GPT Asistente &mdash; Control de suscripciones y accesos</p>
+    <p class="sub">GPT Asistente — Control de suscripciones y accesos</p>
     <div class="form-grid" style="margin-bottom:16px;">
       <div class="field">
         <label>URL Supabase Functions</label>
@@ -193,11 +297,17 @@
 <!-- ========== APP ========== -->
 <div id="app">
   <div class="topbar">
-    <div class="topbar-brand"><span class="dot"></span>GPT Asistente &mdash; Admin</div>
+    <div class="topbar-brand"><span class="dot"></span>GPT Asistente — Admin</div>
     <div class="topbar-right">
       <span class="topbar-url" id="t-url"></span>
-      <button class="btn btn-ghost btn-sm" id="t-refresh">&#x21BB; Actualizar</button>
-      <button class="btn btn-danger btn-sm" id="t-logout">Salir</button>
+      <button class="btn btn-ghost btn-sm" id="t-refresh">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        Actualizar
+      </button>
+      <button class="btn btn-danger btn-sm" id="t-logout">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Salir
+      </button>
     </div>
   </div>
 
@@ -205,39 +315,110 @@
     <!-- SIDEBAR -->
     <nav class="sidebar">
       <span class="sidebar-label">Principal</span>
-      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</div>
-      <span class="sidebar-label">Gesti&oacute;n</span>
-      <div class="nav-item" data-page="clientes"><span class="nav-icon">&#x1F465;</span> Clientes <span class="nav-badge" id="badge-v" style="display:none">0</span></div>
-      <div class="nav-item" data-page="cuentas"><span class="nav-icon">&#x1F511;</span> Cuentas Maestras</div>
-      <div class="nav-item" data-page="pagos"><span class="nav-icon">&#x1F4B0;</span> Pagos</div>
+      <div class="nav-item active" data-page="dashboard">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span>
+        Dashboard
+      </div>
+      <span class="sidebar-label">Gestión</span>
+      <div class="nav-item" data-page="clientes">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        Clientes <span class="nav-badge" id="badge-v" style="display:none">0</span>
+      </div>
+      <div class="nav-item" data-page="cuentas">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+        Cuentas Maestras
+      </div>
+      <div class="nav-item" data-page="pagos">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        Pagos
+      </div>
       <span class="sidebar-label">Sistema</span>
-      <div class="nav-item" data-page="logs"><span class="nav-icon">&#x1F4CB;</span> Logs de Acceso</div>
+      <div class="nav-item" data-page="logs">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+        Logs de Acceso
+      </div>
     </nav>
 
     <!-- CONTENT -->
     <main class="content">
+
+      <!-- BANNER DE MIGRACIÓN MASIVA ACTIVA -->
+      <div class="migration-banner" id="migrationBanner">
+        <div class="migration-banner-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+        </div>
+        <div class="migration-banner-content">
+          <div class="migration-banner-title" id="migBannerTitle">Migración masiva en progreso</div>
+          <div class="migration-banner-sub" id="migBannerSub">Preparando...</div>
+          <div class="migration-banner-progress"><div id="migBannerBar" style="width: 0%"></div></div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="cancelarBatchActivo()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Cancelar
+        </button>
+      </div>
 
       <!-- DASHBOARD -->
       <div class="page active" id="page-dashboard">
         <div class="page-header">
           <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-ts"></div></div>
           <div class="action-row">
-            <button class="btn btn-danger btn-sm" onclick="revocarTodos()" title="Revoca el acceso a TODOS los clientes">&#x1F6A8; Revocar todos</button>
-            <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">&#x21BB; Actualizar</button>
+            <button class="btn btn-danger btn-sm" onclick="revocarTodos()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Revocar todos
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+              Actualizar
+            </button>
           </div>
         </div>
         <div class="stat-grid">
-          <div class="stat-card"><div class="stat-icon">&#x2705;</div><div class="stat-label">Clientes Activos</div><div class="stat-value green" id="s1">&mdash;</div></div>
-          <div class="stat-card"><div class="stat-icon">&#x23F0;</div><div class="stat-label">Clientes Vencidos</div><div class="stat-value red" id="s2">&mdash;</div></div>
-          <div class="stat-card"><div class="stat-icon">&#x26A0;&#xFE0F;</div><div class="stat-label">Suspendidos</div><div class="stat-value yellow" id="s3">&mdash;</div></div>
-          <div class="stat-card"><div class="stat-icon">&#x1F4C5;</div><div class="stat-label">Vencen esta semana</div><div class="stat-value yellow" id="s4">&mdash;</div></div>
-          <div class="stat-card"><div class="stat-icon">&#x1F4B5;</div><div class="stat-label">Ingresos del mes</div><div class="stat-value blue" id="s5">&mdash;</div></div>
-          <div class="stat-card"><div class="stat-icon">&#x1F511;</div><div class="stat-label">Cuentas Activas</div><div class="stat-value green" id="s6">&mdash;</div></div>
-          <div class="stat-card"><div class="stat-icon">&#x1F6AB;</div><div class="stat-label">Cuentas Baneadas</div><div class="stat-value red" id="s7">&mdash;</div></div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div class="stat-label">Clientes Activos</div>
+            <div class="stat-value green" id="s1">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="stat-label">Vencidos</div>
+            <div class="stat-value red" id="s2">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div class="stat-label">Suspendidos</div>
+            <div class="stat-value yellow" id="s3">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div class="stat-label">Vencen esta semana</div>
+            <div class="stat-value yellow" id="s4">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="stat-label">Ingresos del mes</div>
+            <div class="stat-value blue" id="s5">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
+            <div class="stat-label">Cuentas Activas</div>
+            <div class="stat-value green" id="s6">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+            <div class="stat-label">Cuentas Baneadas</div>
+            <div class="stat-value red" id="s7">—</div>
+          </div>
         </div>
         <div class="card">
-          <div class="card-title">&#x26A0;&#xFE0F; Pr&oacute;ximos a vencer (&le; 5 d&iacute;as) <button class="btn btn-ghost btn-sm" onclick="switchPage('clientes')">Ver todos &rarr;</button></div>
-          <div id="proximos-wrap"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></div>
+          <div class="card-title">
+            <div class="card-title-icon">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Próximos a vencer (≤ 5 días)
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="switchPage('clientes')">Ver todos →</button>
+          </div>
+          <div id="proximos-wrap"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></div>
         </div>
       </div>
 
@@ -246,8 +427,17 @@
         <div class="page-header">
           <div><div class="page-title">Clientes</div><div class="page-sub" id="clientes-ct"></div></div>
           <div class="action-row">
-            <button class="btn btn-ghost btn-sm" onclick="loadClientes()">&#x21BB;</button>
-            <button class="btn btn-primary" onclick="openModal('m-new-c')">+ Nuevo cliente</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadClientes()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+            </button>
+            <button class="btn btn-migrate btn-sm" onclick="abrirMigrarTodos()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+              Migrar todos
+            </button>
+            <button class="btn btn-primary" onclick="openModal('m-new-c')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nuevo cliente
+            </button>
           </div>
         </div>
         <div class="card" style="padding:16px;">
@@ -261,10 +451,30 @@
               <option value="cancelado">Cancelados</option>
             </select>
           </div>
+
+          <!-- BULK TOOLBAR -->
+          <div class="bulk-toolbar" id="bulkToolbar">
+            <span class="bulk-count" id="bulkCount">0 seleccionados</span>
+            <button class="btn btn-migrate btn-sm" onclick="abrirMigrarSeleccionados()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+              Migrar seleccionados
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="revocarSeleccionados()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Revocar seleccionados
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="limpiarSeleccion()">Cancelar</button>
+          </div>
+
           <div class="table-wrap">
             <table>
-              <thead><tr><th>ID</th><th>Usuario</th><th>Nombre</th><th>Estado</th><th>Suscripci&oacute;n</th><th>Vencimiento</th><th>D&iacute;as</th><th>Cuenta Maestra</th><th>Acciones</th></tr></thead>
-              <tbody id="cli-tb"><tr><td colspan="9"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+              <thead>
+                <tr>
+                  <th style="width:36px;"><div class="checkbox-wrap"><input type="checkbox" class="checkbox" id="selectAllCli" onchange="toggleSelectAll(this)"></div></th>
+                  <th>ID</th><th>Usuario</th><th>Nombre</th><th>Estado</th><th>Suscripción</th><th>Vencimiento</th><th>Días</th><th>Cuenta Maestra</th><th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="cli-tb"><tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -273,17 +483,22 @@
       <!-- CUENTAS MAESTRAS -->
       <div class="page" id="page-cuentas">
         <div class="page-header">
-          <div><div class="page-title">Cuentas Maestras</div><div class="page-sub">Credenciales compartidas de ChatGPT</div></div>
+          <div><div class="page-title">Cuentas Maestras</div><div class="page-sub">Credenciales compartidas</div></div>
           <div class="action-row">
-            <button class="btn btn-ghost btn-sm" onclick="loadCuentas()">&#x21BB;</button>
-            <button class="btn btn-primary" onclick="openModal('m-new-cm')">+ Nueva cuenta</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadCuentas()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+            </button>
+            <button class="btn btn-primary" onclick="openModal('m-new-cm')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Nueva cuenta
+            </button>
           </div>
         </div>
         <div class="card" style="padding:16px;">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>ID</th><th>Producto</th><th>Email</th><th>Estado</th><th>TOTP</th><th>Alta</th><th>&Uacute;lt. verif.</th><th>OK?</th><th>Notas</th><th>Acciones</th></tr></thead>
-              <tbody id="cm-tb"><tr><td colspan="10"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+              <thead><tr><th>ID</th><th>Producto</th><th>Email</th><th>Estado</th><th>TOTP</th><th>Alta</th><th>Últ. verif.</th><th>OK?</th><th>Notas</th><th>Acciones</th></tr></thead>
+              <tbody id="cm-tb"><tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -292,14 +507,16 @@
       <!-- PAGOS -->
       <div class="page" id="page-pagos">
         <div class="page-header">
-          <div><div class="page-title">Historial de Pagos</div><div class="page-sub">&Uacute;ltimos 100 pagos</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="loadPagos()">&#x21BB;</button>
+          <div><div class="page-title">Historial de Pagos</div><div class="page-sub">Últimos 100 pagos</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="loadPagos()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          </button>
         </div>
         <div class="card" style="padding:16px;">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Moneda</th><th>M&eacute;todo</th><th>Referencia</th><th>Fecha</th><th>Notas</th></tr></thead>
-              <tbody id="pag-tb"><tr><td colspan="8"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+              <thead><tr><th>ID</th><th>Cliente</th><th>Monto</th><th>Moneda</th><th>Método</th><th>Referencia</th><th>Fecha</th><th>Notas</th></tr></thead>
+              <tbody id="pag-tb"><tr><td colspan="8"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -309,11 +526,13 @@
       <div class="page" id="page-logs">
         <div class="page-header">
           <div><div class="page-title">Logs de Acceso</div><div class="page-sub">Actividad reciente de clientes</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="loadLogs()">&#x21BB;</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadLogs()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          </button>
         </div>
         <div class="card" style="padding:16px;">
           <div class="search-bar">
-            <input class="search-input" type="text" id="q-log" placeholder="Buscar acci&oacute;n, IP...">
+            <input class="search-input" type="text" id="q-log" placeholder="Buscar acción, IP...">
             <select class="sel" id="f-res">
               <option value="">Todos</option>
               <option value="exitoso">Exitosos</option>
@@ -325,8 +544,8 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>ID</th><th>Cliente</th><th>Acci&oacute;n</th><th>Resultado</th><th>IP</th><th>Fecha</th></tr></thead>
-              <tbody id="log-tb"><tr><td colspan="6"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr></tbody>
+              <thead><tr><th>ID</th><th>Cliente</th><th>Acción</th><th>Resultado</th><th>IP</th><th>Fecha</th></tr></thead>
+              <tbody id="log-tb"><tr><td colspan="6"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -341,17 +560,25 @@
 <!-- Nuevo Cliente -->
 <div class="modal-overlay hidden" id="m-new-c">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Nuevo Cliente</div><button class="modal-close" onclick="closeModal('m-new-c')">&#x00D7;</button></div>
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Nuevo Cliente
+      </div>
+      <button class="modal-close" onclick="closeModal('m-new-c')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <div class="form-grid">
       <div class="form-grid form-2" style="display:grid;">
         <div class="field"><label>Usuario *</label><input type="text" id="nc-u" placeholder="ej: juan123" autocomplete="off"></div>
-        <div class="field"><label>Contrase&ntilde;a *</label><input type="text" id="nc-p" placeholder="Contrase&ntilde;a de acceso" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
+        <div class="field"><label>Contraseña *</label><input type="text" id="nc-p" placeholder="Contraseña de acceso" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
       </div>
       <div class="form-grid form-2" style="display:grid;">
-        <div class="field"><label>Nombre completo</label><input type="text" id="nc-n" placeholder="Juan P&eacute;rez" autocomplete="off"></div>
+        <div class="field"><label>Nombre completo</label><input type="text" id="nc-n" placeholder="Juan Pérez" autocomplete="off"></div>
         <div class="field"><label>Email</label><input type="email" id="nc-e" placeholder="juan@ejemplo.com" autocomplete="off"></div>
       </div>
-      <div class="field"><label>D&iacute;as de suscripci&oacute;n</label><input type="number" id="nc-d" value="30" min="1" max="365"></div>
+      <div class="field"><label>Días de suscripción</label><input type="number" id="nc-d" value="30" min="1" max="365"></div>
     </div>
     <div id="nc-alert" class="alert-box error"></div>
     <div class="modal-footer">
@@ -364,15 +591,23 @@
 <!-- Renovar -->
 <div class="modal-overlay hidden" id="m-ren">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Renovar Suscripci&oacute;n</div><button class="modal-close" onclick="closeModal('m-ren')">&#x00D7;</button></div>
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        Renovar Suscripción
+      </div>
+      <button class="modal-close" onclick="closeModal('m-ren')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <div id="ren-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></div>
     <div class="form-grid">
       <div class="form-grid form-2" style="display:grid;">
-        <div class="field"><label>D&iacute;as a agregar</label><input type="number" id="ren-d" value="30" min="1" max="365"></div>
+        <div class="field"><label>Días a agregar</label><input type="number" id="ren-d" value="30" min="1" max="365"></div>
         <div class="field"><label>Monto (BOB)</label><input type="number" id="ren-m" value="0" min="0" step="0.01"></div>
       </div>
       <div class="form-grid form-2" style="display:grid;">
-        <div class="field"><label>M&eacute;todo de pago</label>
+        <div class="field"><label>Método de pago</label>
           <select id="ren-met"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option><option value="qr">QR</option><option value="otro">Otro</option></select>
         </div>
         <div class="field"><label>Referencia</label><input type="text" id="ren-ref" placeholder="Opcional" autocomplete="off"></div>
@@ -386,12 +621,20 @@
   </div>
 </div>
 
-<!-- Confirmar Suspender -->
+<!-- Suspender -->
 <div class="modal-overlay hidden" id="m-sus">
-  <div class="modal" style="max-width:380px;">
-    <div class="modal-header"><div class="modal-title">&#x26A0;&#xFE0F; Suspender cliente</div><button class="modal-close" onclick="closeModal('m-sus')">&#x00D7;</button></div>
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Suspender cliente
+      </div>
+      <button class="modal-close" onclick="closeModal('m-sus')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <p id="sus-info" style="color:var(--text-muted);font-size:13px;margin-bottom:10px;"></p>
-    <p style="color:var(--danger);font-size:13px;">El cliente perder&aacute; acceso en la pr&oacute;xima verificaci&oacute;n (m&aacute;x. 15 min).</p>
+    <p style="color:var(--danger);font-size:13px;">El cliente perderá acceso en la próxima verificación (máx. 15 min).</p>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-sus')">Cancelar</button>
       <button class="btn btn-danger" id="sus-btn" onclick="doSuspender()">Suspender</button>
@@ -399,30 +642,43 @@
   </div>
 </div>
 
-<!-- Confirmar Revocar -->
+<!-- Revocar -->
 <div class="modal-overlay hidden" id="m-rev">
-  <div class="modal" style="max-width:420px;">
-    <div class="modal-header"><div class="modal-title">&#x1F512; Revocar acceso</div><button class="modal-close" onclick="closeModal('m-rev')">&#x00D7;</button></div>
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Revocar acceso
+      </div>
+      <button class="modal-close" onclick="closeModal('m-rev')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <p id="rev-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;"></p>
     <p style="color:var(--danger);font-size:13px;line-height:1.6;">
-      El cliente ser&aacute; expulsado <strong>inmediatamente</strong> de ChatGPT.
-      Su sesi&oacute;n se cerrar&aacute; en segundos si est&aacute; activo, o en m&aacute;ximo 15 min.
+      El cliente será expulsado <strong>inmediatamente</strong> de ChatGPT.
+      Su sesión se cerrará en segundos si está activo, o en máximo 15 min.
       <br><br>
-      <strong>Podr&aacute; volver a entrar</strong> con sus credenciales (a menos que tambi&eacute;n lo suspendas).
+      <strong>Podrá volver a entrar</strong> con sus credenciales (a menos que también lo suspendas).
     </p>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-rev')">Cancelar</button>
-      <button class="btn btn-danger" id="rev-btn" onclick="doRevocar()">&#x1F512; Revocar ahora</button>
+      <button class="btn btn-danger" id="rev-btn" onclick="doRevocar()">Revocar ahora</button>
     </div>
   </div>
 </div>
 
-<!-- 🔄 Confirmar Migrar -->
+<!-- Migrar a cuenta (individual o seleccionados) -->
 <div class="modal-overlay hidden" id="m-mig">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">&#x1F504; Migrar a otra cuenta maestra</div>
-      <button class="modal-close" onclick="closeModal('m-mig')">&#x00D7;</button>
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+        Migrar a otra cuenta maestra
+      </div>
+      <button class="modal-close" onclick="closeModal('m-mig')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <p id="mig-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></p>
     <div class="field">
@@ -430,16 +686,55 @@
       <select id="mig-cuenta" class="sel" style="width:100%;"></select>
     </div>
     <p style="color:var(--warning);font-size:12px;margin-top:14px;line-height:1.6;padding:10px;background:var(--warning-dim);border-radius:8px;border:1px solid rgba(245,158,11,0.3);">
-      &#x26A0;&#xFE0F; El cliente ser&aacute; desconectado de ChatGPT y reconectado con la nueva cuenta.
-      <br><br>
-      El proceso es autom&aacute;tico y ocurre en la extensi&oacute;n (en segundos si est&aacute; activo, o m&aacute;ximo 15 min).
-      <br><br>
-      Durante la migraci&oacute;n <strong>no hay consumo de base de datos</strong>.
+      El cliente será desconectado de ChatGPT y reconectado con la nueva cuenta.
+      El proceso es automático (segundos si está activo, o máximo 15 min).
     </p>
     <div id="mig-alert" class="alert-box error"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-mig')">Cancelar</button>
-      <button class="btn btn-migrate" id="mig-btn" onclick="doMigrar()">&#x1F504; Migrar ahora</button>
+      <button class="btn btn-migrate" id="mig-btn" onclick="doMigrar()">Migrar ahora</button>
+    </div>
+  </div>
+</div>
+
+<!-- Migrar masiva (todos o seleccionados) -->
+<div class="modal-overlay hidden" id="m-mig-batch">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+        Migración masiva
+      </div>
+      <button class="modal-close" onclick="closeModal('m-mig-batch')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p id="migb-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></p>
+    <div class="field">
+      <label>Nueva cuenta maestra</label>
+      <select id="migb-cuenta" class="sel" style="width:100%;"></select>
+    </div>
+    <div class="field" style="margin-top:14px;">
+      <label>Intervalo entre migraciones (minutos)</label>
+      <input type="number" id="migb-intervalo" value="20" min="5" max="180" step="5">
+      <span style="font-size:11px;color:var(--text-dim);margin-top:4px;">Mínimo 5 min · Máximo 180 min · Recomendado: 20 min</span>
+    </div>
+
+    <div class="batch-preview">
+      <div class="batch-preview-row"><span>Clientes a migrar</span><span id="migb-total">0</span></div>
+      <div class="batch-preview-row"><span>Intervalo</span><span id="migb-intervalo-txt">20 min</span></div>
+      <div class="batch-preview-row batch-preview-total"><span>Tiempo estimado total</span><span id="migb-tiempo">0 min</span></div>
+    </div>
+
+    <p style="color:var(--warning);font-size:12px;margin-top:14px;line-height:1.6;padding:10px;background:var(--warning-dim);border-radius:8px;border:1px solid rgba(245,158,11,0.3);">
+      La migración se ejecutará de forma automática en segundo plano.
+      Puedes cerrar esta pestaña: el proceso continuará en el servidor.
+    </p>
+
+    <div id="migb-alert" class="alert-box error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-mig-batch')">Cancelar</button>
+      <button class="btn btn-migrate" id="migb-btn" onclick="doMigrarBatch()">Iniciar migración masiva</button>
     </div>
   </div>
 </div>
@@ -447,14 +742,22 @@
 <!-- Nueva Cuenta Maestra -->
 <div class="modal-overlay hidden" id="m-new-cm">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Nueva Cuenta Maestra</div><button class="modal-close" onclick="closeModal('m-new-cm')">&#x00D7;</button></div>
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        Nueva Cuenta Maestra
+      </div>
+      <button class="modal-close" onclick="closeModal('m-new-cm')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
     <div class="form-grid">
       <div class="field"><label>Producto</label>
         <select id="cm-prod"><option value="chatgpt">ChatGPT</option><option value="gemini">Gemini</option><option value="codex">Codex</option><option value="otro">Otro</option></select>
       </div>
       <div class="field"><label>Email de la cuenta *</label><input type="email" id="cm-e" placeholder="cuenta@openai.com" autocomplete="off"></div>
-      <div class="field"><label>Contrase&ntilde;a de la cuenta *</label><input type="text" id="cm-p" placeholder="Contrase&ntilde;a de ChatGPT" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
-      <div class="field"><label>TOTP Seed (2FA) &mdash; opcional</label><input type="text" id="cm-t" placeholder="Base32 seed del autenticador" autocomplete="off"></div>
+      <div class="field"><label>Contraseña de la cuenta *</label><input type="text" id="cm-p" placeholder="Contraseña de ChatGPT" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
+      <div class="field"><label>TOTP Seed (2FA) — opcional</label><input type="text" id="cm-t" placeholder="Base32 seed del autenticador" autocomplete="off"></div>
       <div class="field"><label>Notas</label><textarea id="cm-n" placeholder="Observaciones..."></textarea></div>
     </div>
     <div id="cm-alert" class="alert-box error"></div>
@@ -469,18 +772,21 @@
 
 <script>
 'use strict';
-var API = '', TOK = '', PENDING = null, PENDING_REV = null, PENDING_MIG = null;
+var API = '', TOK = '', PENDING = null, PENDING_REV = null, PENDING_MIG = null, PENDING_MIG_BATCH = null;
+var SELECCIONADOS = new Set();
+var BATCH_ACTIVO = null;
+var INTERVALO_BATCH_POLL = null;
 
 /* ── HELPERS ── */
 function $(id){ return document.getElementById(id); }
 function esc(s){ return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-function fmtD(s){ if(!s)return'&mdash;'; var d=new Date(s); return isNaN(d)?esc(s):d.toLocaleDateString('es-BO',{day:'2-digit',month:'short',year:'numeric'}); }
-function fmtDT(s){ if(!s)return'&mdash;'; var d=new Date(s); return isNaN(d)?esc(s):d.toLocaleString('es-BO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+function fmtD(s){ if(!s)return'—'; var d=new Date(s); return isNaN(d)?esc(s):d.toLocaleDateString('es-BO',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDT(s){ if(!s)return'—'; var d=new Date(s); return isNaN(d)?esc(s):d.toLocaleString('es-BO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
 
 function badge(v){
   var c=(v||'').toLowerCase().replace(/[^a-z]/g,'');
   var L={activo:'Activo',activa:'Activa',vencido:'Vencido',vencida:'Vencida',suspendido:'Suspendido',cancelado:'Cancelado',cancelada:'Cancelada',baneada:'Baneada',reserva:'Reserva',renovada:'Renovada',revocado:'Revocado',migracion:'Migrado'};
-  return '<span class="badge '+c+'">'+(L[c]||esc(v)||'&mdash;')+'</span>';
+  return '<span class="badge '+c+'">'+(L[c]||esc(v)||'—')+'</span>';
 }
 
 function diasPill(n){
@@ -492,14 +798,21 @@ function diasPill(n){
   return '<div class="dias-wrap"><span class="dias-pill '+cls+'">'+lbl+'</span><div class="dias-bar"><div class="dias-bar-fill" style="width:'+pct+'%;background:'+col+';"></div></div></div>';
 }
 
+var ICON = {
+  check: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  x: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+  info: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+};
+
 function toast(msg,type){
   type=type||'success';
   var el=document.createElement('div');
   el.className='toast '+type;
-  var ico=type==='success'?'&#x2705;':type==='error'?'&#x274C;':'&#x2139;&#xFE0F;';
-  el.innerHTML='<span>'+ico+'</span><span>'+msg+'</span>';
+  var ico=type==='success'?ICON.check:type==='error'?ICON.x:type==='warning'?ICON.warn:ICON.info;
+  el.innerHTML=ico+'<span>'+msg+'</span>';
   $('toast-container').appendChild(el);
-  setTimeout(function(){ el.remove(); },3500);
+  setTimeout(function(){ el.remove(); },4000);
 }
 
 function showA(id,msg,type){
@@ -532,12 +845,18 @@ $('l-btn').addEventListener('click',async function(){
     $('login-screen').style.display='none';
     $('app').classList.add('visible');
     loadAll();
+    verificarBatchActivo();
+    INTERVALO_BATCH_POLL = setInterval(verificarBatchActivo, 30000);
   }catch(e){showA('l-alert','No se pudo conectar: '+e.message); API=''; TOK='';}
   finally{btn.disabled=false; btn.textContent='Entrar al panel';}
 });
 $('l-token').addEventListener('keyup',function(e){ if(e.key==='Enter')$('l-btn').click(); });
-$('t-logout').addEventListener('click',function(){ localStorage.removeItem('gptAdminUrl'); location.reload(); });
-$('t-refresh').addEventListener('click',loadAll);
+$('t-logout').addEventListener('click',function(){
+  if(INTERVALO_BATCH_POLL) clearInterval(INTERVALO_BATCH_POLL);
+  localStorage.removeItem('gptAdminUrl');
+  location.reload();
+});
+$('t-refresh').addEventListener('click',function(){ loadAll(); verificarBatchActivo(); });
 window.addEventListener('DOMContentLoaded',function(){ var u=localStorage.getItem('gptAdminUrl'); if(u)$('l-url').value=u; });
 
 /* ── NAV ── */
@@ -572,13 +891,13 @@ async function loadDashboard(){
   try{
     var r=await api('dashboard');
     var d=r.dashboard||{};
-    $('s1').textContent=d.clientes_activos!=null?d.clientes_activos:'&mdash;';
-    $('s2').textContent=d.clientes_vencidos!=null?d.clientes_vencidos:'&mdash;';
-    $('s3').textContent=d.clientes_suspendidos!=null?d.clientes_suspendidos:'&mdash;';
-    $('s4').textContent=d.vencen_esta_semana!=null?d.vencen_esta_semana:'&mdash;';
-    $('s5').textContent=d.ingresos_mes_actual!=null?'Bs '+Number(d.ingresos_mes_actual).toFixed(2):'&mdash;';
-    $('s6').textContent=d.cuentas_activas!=null?d.cuentas_activas:'&mdash;';
-    $('s7').textContent=d.cuentas_baneadas!=null?d.cuentas_baneadas:'&mdash;';
+    $('s1').textContent=d.clientes_activos!=null?d.clientes_activos:'—';
+    $('s2').textContent=d.clientes_vencidos!=null?d.clientes_vencidos:'—';
+    $('s3').textContent=d.clientes_suspendidos!=null?d.clientes_suspendidos:'—';
+    $('s4').textContent=d.vencen_esta_semana!=null?d.vencen_esta_semana:'—';
+    $('s5').textContent=d.ingresos_mes_actual!=null?'Bs '+Number(d.ingresos_mes_actual).toFixed(2):'—';
+    $('s6').textContent=d.cuentas_activas!=null?d.cuentas_activas:'—';
+    $('s7').textContent=d.cuentas_baneadas!=null?d.cuentas_baneadas:'—';
     $('dash-ts').textContent='Actualizado: '+new Date().toLocaleTimeString('es-BO');
     var bv=$('badge-v'), nv=Number(d.clientes_vencidos||0);
     bv.textContent=nv; bv.style.display=nv>0?'inline-flex':'none';
@@ -590,12 +909,12 @@ async function loadDashboard(){
       .sort(function(a,b){return Number(a.dias_restantes)-Number(b.dias_restantes);});
     var wrap=$('proximos-wrap');
     if(!prx.length){
-      wrap.innerHTML='<div class="empty-state"><div class="icon">&#x1F389;</div><p>Ning&uacute;n cliente vence en los pr&oacute;ximos 5 d&iacute;as</p></div>';
+      wrap.innerHTML='<div class="empty-state"><p>Ningún cliente vence en los próximos 5 días</p></div>';
     }else{
-      wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>D&iacute;as</th><th>Vencimiento</th><th>Acci&oacute;n</th></tr></thead><tbody>'+
+      wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>Días</th><th>Vencimiento</th><th>Acción</th></tr></thead><tbody>'+
         prx.map(function(c){
-          return '<tr><td><strong>'+esc(c.usuario)+'</strong></td><td>'+esc(c.nombre_completo||'&mdash;')+'</td><td>'+diasPill(c.dias_restantes)+'</td><td>'+fmtD(c.fecha_vencimiento)+'</td>'+
-            '<td><button class="btn btn-success btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')">&#x21BB; Renovar</button></td></tr>';
+          return '<tr><td><strong>'+esc(c.usuario)+'</strong></td><td>'+esc(c.nombre_completo||'—')+'</td><td>'+diasPill(c.dias_restantes)+'</td><td>'+fmtD(c.fecha_vencimiento)+'</td>'+
+            '<td><button class="btn btn-success btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')">Renovar</button></td></tr>';
         }).join('')+'</tbody></table></div>';
     }
   }catch(e){}
@@ -605,11 +924,13 @@ async function loadDashboard(){
 var ALL_CLI=[];
 
 async function loadClientes(){
-  $('cli-tb').innerHTML='<tr><td colspan="9"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  $('cli-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr>';
   try{
     var r=await api('listar_clientes');
     ALL_CLI=r.clientes||[];
     $('clientes-ct').textContent=ALL_CLI.length+' registros';
+    SELECCIONADOS.clear();
+    actualizarBulkToolbar();
     renderCli();
   }catch(e){ toast('Error clientes: '+e.message,'error'); }
 }
@@ -622,45 +943,118 @@ function renderCli(){
     var me=!ef||(c.estado_cliente||'')===ef;
     return mq&&me;
   });
-  if(!f.length){ $('cli-tb').innerHTML='<tr><td colspan="9"><div class="empty-state"><div class="icon">&#x1F50D;</div><p>Sin resultados</p></div></td></tr>'; return; }
+  if(!f.length){ $('cli-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><p>Sin resultados</p></div></td></tr>'; return; }
+
   $('cli-tb').innerHTML=f.map(function(c){
     var est=(c.estado_cliente||'activo').toLowerCase();
     var canSus=est==='activo'||est==='vencido';
     var canRea=est==='suspendido'||est==='vencido'||est==='cancelado';
     var canRev=est!=='cancelado';
     var canMig=est!=='cancelado' && est!=='suspendido';
-    return '<tr>'+
+    var checked=SELECCIONADOS.has(c.id) ? 'checked' : '';
+    return '<tr class="'+(checked?'selected':'')+'" data-cliente-id="'+c.id+'">'+
+      '<td><div class="checkbox-wrap"><input type="checkbox" class="checkbox" '+checked+' onchange="toggleSeleccion('+c.id+',this)"></div></td>'+
       '<td><span class="chip">#'+c.id+'</span></td>'+
       '<td><strong>'+esc(c.usuario)+'</strong></td>'+
-      '<td>'+esc(c.nombre_completo||'&mdash;')+'</td>'+
+      '<td>'+esc(c.nombre_completo||'—')+'</td>'+
       '<td>'+badge(c.estado_cliente)+'</td>'+
       '<td>'+badge(c.estado_suscripcion)+' <span class="chip" style="margin-left:4px;">'+esc(c.producto||'chatgpt')+'</span></td>'+
       '<td>'+fmtD(c.fecha_vencimiento)+'</td>'+
       '<td>'+diasPill(c.dias_restantes)+'</td>'+
-      '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.cuenta_maestra_email||'&mdash;')+'</span></td>'+
+      '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.cuenta_maestra_email||'—')+'</span></td>'+
       '<td><div class="action-row">'+
-        '<button class="btn btn-info btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')" title="Renovar">&#x21BB;</button>'+
-        (canMig?'<button class="btn btn-migrate btn-sm" onclick="abrirMigrar('+c.id+',\''+esc(c.usuario)+'\')" title="Migrar a otra cuenta maestra">&#x1F504;</button>':'')+
-        (canSus?'<button class="btn btn-danger btn-sm" onclick="abrirSuspender('+c.id+',\''+esc(c.usuario)+'\')" title="Suspender licencia">Suspender</button>':'')+
-        (canRev?'<button class="btn btn-danger btn-sm" onclick="abrirRevocar('+c.id+',\''+esc(c.usuario)+'\')" title="Forzar cierre de sesión" style="background:rgba(239,68,68,0.3);">&#x1F512; Revocar</button>':'')+
-        (canRea?'<button class="btn btn-success btn-sm" onclick="doReactivar('+c.id+',\''+esc(c.usuario)+'\')">Reactivar</button>':'')+
+        '<button class="btn btn-info btn-icon btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')" title="Renovar">'+
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>'+
+        '</button>'+
+        (canMig?'<button class="btn btn-migrate btn-icon btn-sm" onclick="abrirMigrar('+c.id+',\''+esc(c.usuario)+'\')" title="Migrar a otra cuenta">'+
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>'+
+        '</button>':'')+
+        (canSus?'<button class="btn btn-warning btn-icon btn-sm" onclick="abrirSuspender('+c.id+',\''+esc(c.usuario)+'\')" title="Suspender">'+
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+
+        '</button>':'')+
+        (canRev?'<button class="btn btn-danger btn-icon btn-sm" onclick="abrirRevocar('+c.id+',\''+esc(c.usuario)+'\')" title="Revocar acceso">'+
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'+
+        '</button>':'')+
+        (canRea?'<button class="btn btn-success btn-icon btn-sm" onclick="doReactivar('+c.id+',\''+esc(c.usuario)+'\')" title="Reactivar">'+
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'+
+        '</button>':'')+
       '</div></td>'+
     '</tr>';
   }).join('');
+
+  // Actualizar select all
+  var visibles=f.map(function(c){return c.id;});
+  var todosSeleccionados = visibles.length>0 && visibles.every(function(id){return SELECCIONADOS.has(id);});
+  var selAll = $('selectAllCli');
+  if(selAll) selAll.checked = todosSeleccionados;
 }
 
 $('q-cli').addEventListener('input',renderCli);
 $('f-est-cli').addEventListener('change',renderCli);
 
+/* ── SELECCIÓN MÚLTIPLE ── */
+function toggleSeleccion(id, checkbox){
+  if(checkbox.checked) SELECCIONADOS.add(id);
+  else SELECCIONADOS.delete(id);
+  var row=document.querySelector('tr[data-cliente-id="'+id+'"]');
+  if(row) row.classList.toggle('selected', checkbox.checked);
+  actualizarBulkToolbar();
+  // Actualizar select all
+  var q=$('q-cli').value.toLowerCase();
+  var ef=$('f-est-cli').value;
+  var visibles=ALL_CLI.filter(function(c){
+    var mq=!q||(c.usuario||'').toLowerCase().includes(q)||(c.nombre_completo||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q);
+    var me=!ef||(c.estado_cliente||'')===ef;
+    return mq&&me;
+  }).map(function(c){return c.id;});
+  var todos = visibles.length>0 && visibles.every(function(id){return SELECCIONADOS.has(id);});
+  $('selectAllCli').checked = todos;
+}
+
+function toggleSelectAll(checkbox){
+  var q=$('q-cli').value.toLowerCase();
+  var ef=$('f-est-cli').value;
+  var visibles=ALL_CLI.filter(function(c){
+    var mq=!q||(c.usuario||'').toLowerCase().includes(q)||(c.nombre_completo||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q);
+    var me=!ef||(c.estado_cliente||'')===ef;
+    return mq&&me;
+  });
+  if(checkbox.checked){
+    visibles.forEach(function(c){ SELECCIONADOS.add(c.id); });
+  }else{
+    visibles.forEach(function(c){ SELECCIONADOS.delete(c.id); });
+  }
+  renderCli();
+  actualizarBulkToolbar();
+}
+
+function limpiarSeleccion(){
+  SELECCIONADOS.clear();
+  $('selectAllCli').checked=false;
+  actualizarBulkToolbar();
+  renderCli();
+}
+
+function actualizarBulkToolbar(){
+  var n=SELECCIONADOS.size;
+  var tb=$('bulkToolbar');
+  if(n>0){
+    tb.classList.add('visible');
+    $('bulkCount').textContent=n+' seleccionado'+(n===1?'':'s');
+  }else{
+    tb.classList.remove('visible');
+  }
+}
+
 /* ── CREAR CLIENTE ── */
 async function crearCliente(){
   var u=$('nc-u').value.trim(), p=$('nc-p').value.trim(), n=$('nc-n').value.trim(), e=$('nc-e').value.trim(), d=parseInt($('nc-d').value)||30;
-  if(!u||!p){showA('nc-alert','Usuario y contrase\u00f1a son obligatorios.');return;}
+  if(!u||!p){showA('nc-alert','Usuario y contraseña son obligatorios.');return;}
   var btn=$('nc-btn'); btn.disabled=true; btn.textContent='Creando...'; hideA('nc-alert');
   try{
     await api('crear_cliente','POST',{usuario:u,password:p,email:e,nombre_completo:n,dias:d});
     closeModal('m-new-c');
-    toast('Cliente "'+u+'" creado con '+d+' d\u00edas');
+    toast('Cliente "'+u+'" creado con '+d+' días');
     $('nc-u').value=''; $('nc-p').value=''; $('nc-n').value=''; $('nc-e').value=''; $('nc-d').value='30';
     loadClientes(); loadDashboard();
   }catch(e){showA('nc-alert',e.message);}
@@ -681,7 +1075,7 @@ async function doRenovar(){
   try{
     await api('renovar','POST',{cliente_id:PENDING.id,dias:d,monto:m,metodo:met,referencia:ref||null});
     closeModal('m-ren');
-    toast('Suscripci\u00f3n de "'+PENDING.usuario+'" renovada por '+d+' d\u00edas');
+    toast('Suscripción de "'+PENDING.usuario+'" renovada por '+d+' días');
     loadClientes(); loadDashboard();
   }catch(e){showA('ren-alert',e.message);}
   finally{btn.disabled=false; btn.textContent='Renovar';}
@@ -690,7 +1084,7 @@ async function doRenovar(){
 /* ── SUSPENDER ── */
 function abrirSuspender(id,usuario){
   PENDING={id:id,usuario:usuario};
-  $('sus-info').innerHTML='\u00bfDeseas suspender a <strong>'+esc(usuario)+'</strong> (ID: '+id+')?';
+  $('sus-info').innerHTML='¿Deseas suspender a <strong>'+esc(usuario)+'</strong> (ID: '+id+')?';
   openModal('m-sus');
 }
 async function doSuspender(){
@@ -699,16 +1093,16 @@ async function doSuspender(){
   try{
     await api('suspender','POST',{cliente_id:PENDING.id});
     closeModal('m-sus');
-    toast('Cliente "'+PENDING.usuario+'" suspendido','info');
+    toast('Cliente "'+PENDING.usuario+'" suspendido','warning');
     loadClientes(); loadDashboard();
   }catch(e){toast('Error: '+e.message,'error');}
   finally{btn.disabled=false; btn.textContent='Suspender';}
 }
 
-/* ── REVOCAR ACCESO ── */
+/* ── REVOCAR ── */
 function abrirRevocar(id,usuario){
   PENDING_REV={id:id,usuario:usuario};
-  $('rev-info').innerHTML='\u00bfForzar el cierre de sesi\u00f3n de <strong>'+esc(usuario)+'</strong> (ID: '+id+')?';
+  $('rev-info').innerHTML='¿Forzar el cierre de sesión de <strong>'+esc(usuario)+'</strong> (ID: '+id+')?';
   openModal('m-rev');
 }
 async function doRevocar(){
@@ -717,33 +1111,34 @@ async function doRevocar(){
   try{
     await api('revocar_acceso','POST',{cliente_id:PENDING_REV.id});
     closeModal('m-rev');
-    toast('\uD83D\uDD12 Acceso de "'+PENDING_REV.usuario+'" revocado. Se cerrar\u00e1 en \u226415 min.','info');
+    toast('Acceso de "'+PENDING_REV.usuario+'" revocado. Se cerrará en ≤15 min.','info');
     loadClientes(); loadDashboard();
   }catch(e){toast('Error al revocar: '+e.message,'error');}
-  finally{btn.disabled=false; btn.innerHTML='&#x1F512; Revocar ahora';}
+  finally{btn.disabled=false; btn.textContent='Revocar ahora';}
 }
 
-/* ── 🔄 MIGRAR CUENTA ── */
+async function revocarSeleccionados(){
+  if(SELECCIONADOS.size===0) return;
+  if(!confirm('¿Revocar el acceso de '+SELECCIONADOS.size+' cliente(s)?')) return;
+  var ids=Array.from(SELECCIONADOS);
+  var ok=0, fail=0;
+  for(var i=0;i<ids.length;i++){
+    try{
+      await api('revocar_acceso','POST',{cliente_id:ids[i]});
+      ok++;
+    }catch(e){ fail++; }
+  }
+  toast('Revocación masiva: '+ok+' exitosos, '+fail+' fallidos', fail>0?'warning':'success');
+  limpiarSeleccion();
+  loadClientes(); loadDashboard();
+}
+
+/* ── MIGRAR INDIVIDUAL ── */
 async function abrirMigrar(id,usuario){
-  PENDING_MIG={id:id,usuario:usuario};
+  PENDING_MIG={id:id,usuario:usuario,scope:'single'};
   $('mig-info').innerHTML='Mover a <strong>'+esc(usuario)+'</strong> (ID: '+id+') a otra cuenta maestra.';
   hideA('mig-alert');
-
-  try{
-    var r=await api('listar_cuentas');
-    var cuentas=(r.cuentas||[]).filter(function(c){ return c.estado==='activa'; });
-    var sel=$('mig-cuenta');
-    if(!cuentas.length){
-      sel.innerHTML='<option value="">No hay cuentas activas disponibles</option>';
-    }else{
-      sel.innerHTML=cuentas.map(function(c){
-        return '<option value="'+c.id+'">'+esc(c.email)+' (#'+c.id+')</option>';
-      }).join('');
-    }
-  }catch(e){
-    showA('mig-alert','Error cargando cuentas: '+e.message);
-  }
-
+  await cargarCuentasEnSelect('mig-cuenta');
   openModal('m-mig');
 }
 
@@ -763,24 +1158,199 @@ async function doMigrar(){
       nueva_cuenta_id:nuevaId
     });
     closeModal('m-mig');
-    toast('\uD83D\uDD04 Migraci\u00f3n de "'+PENDING_MIG.usuario+'" iniciada. Se aplicar\u00e1 en \u226415 min.','info');
+    toast('Migración de "'+PENDING_MIG.usuario+'" iniciada. Se aplicará en ≤15 min.','info');
     loadClientes();
     loadDashboard();
   }catch(e){
     showA('mig-alert',e.message);
   }finally{
     btn.disabled=false;
-    btn.innerHTML='&#x1F504; Migrar ahora';
+    btn.textContent='Migrar ahora';
   }
 }
 
-/* ── REVOCAR TODOS (emergencia) ── */
+async function abrirMigrarSeleccionados(){
+  if(SELECCIONADOS.size===0) return;
+  PENDING_MIG_BATCH={ids:Array.from(SELECCIONADOS),scope:'seleccion'};
+  await abrirModalMigracionBatch('seleccion');
+}
+
+async function abrirMigrarTodos(){
+  // Filtrar clientes activos o vencidos (no suspendidos ni cancelados)
+  var elegibles=ALL_CLI.filter(function(c){
+    var e=(c.estado_cliente||'').toLowerCase();
+    return e==='activo'||e==='vencido';
+  });
+  if(!elegibles.length){
+    toast('No hay clientes elegibles para migrar.','warning');
+    return;
+  }
+  PENDING_MIG_BATCH={ids:elegibles.map(function(c){return c.id;}),scope:'todos'};
+  await abrirModalMigracionBatch('todos');
+}
+
+async function abrirModalMigracionBatch(scope){
+  if(!PENDING_MIG_BATCH || !PENDING_MIG_BATCH.ids.length) return;
+
+  var n=PENDING_MIG_BATCH.ids.length;
+  var label = scope==='todos' ? 'TODOS los clientes activos/vencidos' : 'los '+n+' clientes seleccionados';
+  $('migb-info').innerHTML='Migrar <strong>'+label+'</strong> ('+n+' en total) a la cuenta seleccionada.';
+
+  await cargarCuentasEnSelect('migb-cuenta');
+
+  $('migb-total').textContent = n;
+  $('migb-intervalo').value = 20;
+  actualizarPreviewBatch();
+
+  $('migb-intervalo').oninput = actualizarPreviewBatch;
+
+  hideA('migb-alert');
+  openModal('m-mig-batch');
+}
+
+function actualizarPreviewBatch(){
+  var n = PENDING_MIG_BATCH ? PENDING_MIG_BATCH.ids.length : 0;
+  var min = parseInt($('migb-intervalo').value) || 20;
+  var tiempoTotal = (n-1) * min;
+  $('migb-intervalo-txt').textContent = min + ' min';
+  var h = Math.floor(tiempoTotal / 60);
+  var m = tiempoTotal % 60;
+  var txt = '';
+  if(h > 0) txt += h + ' h ';
+  txt += m + ' min';
+  $('migb-tiempo').textContent = txt;
+}
+
+async function cargarCuentasEnSelect(selectId){
+  try{
+    var r=await api('listar_cuentas');
+    var cuentas=(r.cuentas||[]).filter(function(c){ return c.estado==='activa'; });
+    var sel=$(selectId);
+    if(!cuentas.length){
+      sel.innerHTML='<option value="">No hay cuentas activas</option>';
+    }else{
+      sel.innerHTML=cuentas.map(function(c){
+        return '<option value="'+c.id+'">'+esc(c.email)+' (#'+c.id+')</option>';
+      }).join('');
+    }
+  }catch(e){
+    var sel=$(selectId);
+    if(sel) sel.innerHTML='<option value="">Error cargando cuentas</option>';
+  }
+}
+
+async function doMigrarBatch(){
+  if(!PENDING_MIG_BATCH || !PENDING_MIG_BATCH.ids.length) return;
+
+  var nuevaId = parseInt($('migb-cuenta').value);
+  var intervalo = parseInt($('migb-intervalo').value) || 20;
+
+  if(!nuevaId){ showA('migb-alert','Selecciona una cuenta maestra.'); return; }
+  if(intervalo < 5){ showA('migb-alert','El intervalo mínimo es 5 minutos.'); return; }
+
+  var btn=$('migb-btn');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div>&nbsp;Creando batch...';
+  hideA('migb-alert');
+
+  try{
+    var r = await api('crear_batch_migracion','POST',{
+      cliente_ids: PENDING_MIG_BATCH.ids,
+      nueva_cuenta_id: nuevaId,
+      intervalo_minutos: intervalo
+    });
+
+    closeModal('m-mig-batch');
+    limpiarSeleccion();
+
+    toast('Migración masiva iniciada: '+r.total_items+' clientes. Se completará en '+(r.tiempo_estimado_min||0)+' min.','info');
+
+    // Activar banner
+    BATCH_ACTIVO = { id: r.batch_id, total: r.total_items };
+    actualizarBannerBatch({ procesados: 0, total: r.total_items, proximo_en: intervalo*60, estado: 'en_progreso' });
+    $('migrationBanner').classList.add('visible');
+
+    // Refrescar cada 20s hasta que termine
+    if(INTERVALO_BATCH_POLL) clearInterval(INTERVALO_BATCH_POLL);
+    INTERVALO_BATCH_POLL = setInterval(verificarBatchActivo, 20000);
+
+    loadClientes();
+    loadDashboard();
+  }catch(e){
+    showA('migb-alert', e.message);
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Iniciar migración masiva';
+  }
+}
+
+/* ── BATCH DE MIGRACIÓN ── */
+async function verificarBatchActivo(){
+  if(!API || !TOK) return;
+  try{
+    var r = await api('estado_batch_migracion');
+    var batch = r.batch;
+
+    if(!batch || batch.estado === 'completado' || batch.estado === 'cancelado'){
+      BATCH_ACTIVO = null;
+      $('migrationBanner').classList.remove('visible');
+      if(INTERVALO_BATCH_POLL && batch && batch.estado === 'completado'){
+        clearInterval(INTERVALO_BATCH_POLL);
+        toast('Migración masiva completada: '+batch.procesados+'/'+batch.total_items,'success');
+        INTERVALO_BATCH_POLL=null;
+      }
+      return;
+    }
+
+    BATCH_ACTIVO = { id: batch.id, total: batch.total_items };
+    actualizarBannerBatch(batch);
+    $('migrationBanner').classList.add('visible');
+  }catch(e){
+    // silent
+  }
+}
+
+function actualizarBannerBatch(batch){
+  var procesados = batch.procesados || 0;
+  var total = batch.total_items || batch.total || 0;
+  var pct = total > 0 ? Math.round((procesados / total) * 100) : 0;
+
+  $('migBannerTitle').textContent = 'Migración masiva en progreso';
+  $('migBannerSub').textContent = procesados + ' de ' + total + ' clientes migrados · ' + pct + '%' + (batch.proximo_en ? ' · Próximo en ' + formatearTiempo(batch.proximo_en) : '');
+  $('migBannerBar').style.width = pct + '%';
+}
+
+function formatearTiempo(segundos){
+  if(!segundos || segundos < 0) return '—';
+  var h = Math.floor(segundos / 3600);
+  var m = Math.floor((segundos % 3600) / 60);
+  var s = segundos % 60;
+  if(h > 0) return h + 'h ' + m + 'm';
+  if(m > 0) return m + 'm ' + s + 's';
+  return s + 's';
+}
+
+async function cancelarBatchActivo(){
+  if(!BATCH_ACTIVO) return;
+  if(!confirm('¿Cancelar la migración masiva en progreso? Los clientes ya migrados permanecerán migrados.')) return;
+  try{
+    await api('cancelar_batch_migracion','POST',{ batch_id: BATCH_ACTIVO.id });
+    toast('Migración masiva cancelada','warning');
+    BATCH_ACTIVO = null;
+    $('migrationBanner').classList.remove('visible');
+    if(INTERVALO_BATCH_POLL){ clearInterval(INTERVALO_BATCH_POLL); INTERVALO_BATCH_POLL=null; }
+  }catch(e){
+    toast('Error: '+e.message,'error');
+  }
+}
+
+/* ── REVOCAR TODOS ── */
 async function revocarTodos(){
-  var txt=prompt('\u26A0\uFE0F\u26A0\uFE0F\u26A0\uFE0F Esto cerrar\u00e1 la sesi\u00f3n de TODOS los clientes.\n\nEscribe REVOCAR para confirmar:');
+  var txt=prompt('Esto cerrará la sesión de TODOS los clientes.\n\nEscribe REVOCAR para confirmar:');
   if(txt!=='REVOCAR'){ toast('Cancelado.','info'); return; }
   try{
     var r=await api('revocar_todos','POST',{});
-    toast('\uD83D\uDD12 Revocaci\u00f3n masiva enviada a '+(r.afectados||0)+' clientes','info');
+    toast('Revocación masiva enviada a '+(r.afectados||0)+' clientes','warning');
   }catch(e){
     toast('Error: '+e.message,'error');
   }
@@ -788,7 +1358,7 @@ async function revocarTodos(){
 
 /* ── REACTIVAR ── */
 async function doReactivar(id,usuario){
-  if(!confirm('\u00bfReactivar al cliente "'+usuario+'"?'))return;
+  if(!confirm('¿Reactivar al cliente "'+usuario+'"?'))return;
   try{
     await api('reactivar','POST',{cliente_id:id});
     toast('Cliente "'+usuario+'" reactivado');
@@ -798,22 +1368,22 @@ async function doReactivar(id,usuario){
 
 /* ── CUENTAS MAESTRAS ── */
 async function loadCuentas(){
-  $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr>';
   try{
     var r=await api('listar_cuentas');
     var cuentas=r.cuentas||[];
-    if(!cuentas.length){ $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon">&#x1F511;</div><p>No hay cuentas maestras</p></div></td></tr>'; return; }
+    if(!cuentas.length){ $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><p>No hay cuentas maestras</p></div></td></tr>'; return; }
     $('cm-tb').innerHTML=cuentas.map(function(c){
       return '<tr>'+
         '<td><span class="chip">#'+c.id+'</span></td>'+
         '<td><span class="chip">'+esc(c.producto||'chatgpt')+'</span></td>'+
         '<td>'+esc(c.email)+'</td>'+
         '<td>'+badge(c.estado)+'</td>'+
-        '<td>'+(c.totp_seed?'<span style="color:var(--accent);">&#x2705;</span>':'<span style="color:var(--text-dim);">&mdash;</span>')+'</td>'+
+        '<td>'+(c.totp_seed?'<span style="color:var(--accent);">'+ICON.check+'</span>':'<span style="color:var(--text-dim);">—</span>')+'</td>'+
         '<td>'+fmtD(c.fecha_alta)+'</td>'+
         '<td>'+fmtDT(c.ultima_verificacion)+'</td>'+
-        '<td>'+(c.verificacion_ok===false?'<span style="color:var(--danger);">&#x274C;</span>':'<span style="color:var(--accent);">&#x2713;</span>')+'</td>'+
-        '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.notas||'&mdash;')+'</span></td>'+
+        '<td>'+(c.verificacion_ok===false?'<span style="color:var(--danger);">'+ICON.x+'</span>':'<span style="color:var(--accent);">'+ICON.check+'</span>')+'</td>'+
+        '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.notas||'—')+'</span></td>'+
         '<td><div class="action-row">'+
           (c.estado==='activa'
             ?'<button class="btn btn-danger btn-sm" onclick="estadoCuenta('+c.id+',\'baneada\')">Banear</button>'
@@ -826,13 +1396,13 @@ async function loadCuentas(){
 
 function estadoCuenta(id,nuevoEstado){
   var acc=nuevoEstado==='baneada'?'banear':'activar';
-  if(!confirm('\u00bfDeseas '+acc+' esta cuenta maestra?'))return;
-  toast('Requiere agregar acci\u00f3n "cambiar_estado_cuenta" a la Edge Function admin.','info');
+  if(!confirm('¿Deseas '+acc+' esta cuenta maestra?'))return;
+  toast('Requiere agregar acción "cambiar_estado_cuenta" a la Edge Function admin.','info');
 }
 
 async function crearCuenta(){
   var prod=$('cm-prod').value, e=$('cm-e').value.trim(), p=$('cm-p').value.trim(), t=$('cm-t').value.trim(), n=$('cm-n').value.trim();
-  if(!e||!p){showA('cm-alert','Email y contrase\u00f1a son obligatorios.');return;}
+  if(!e||!p){showA('cm-alert','Email y contraseña son obligatorios.');return;}
   var btn=$('cm-btn'); btn.disabled=true; btn.textContent='Creando...'; hideA('cm-alert');
   try{
     await api('crear_cuenta','POST',{producto:prod,email:e,password:p,totp_seed:t||null,notas:n||null});
@@ -846,21 +1416,21 @@ async function crearCuenta(){
 
 /* ── PAGOS ── */
 async function loadPagos(){
-  $('pag-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  $('pag-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr>';
   try{
     var r=await api('listar_pagos');
     var pagos=r.pagos||[];
-    if(!pagos.length){ $('pag-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">&#x1F4B0;</div><p>No hay pagos registrados</p></div></td></tr>'; return; }
+    if(!pagos.length){ $('pag-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><p>No hay pagos registrados</p></div></td></tr>'; return; }
     $('pag-tb').innerHTML=pagos.map(function(p){
       return '<tr>'+
         '<td><span class="chip">#'+p.id+'</span></td>'+
-        '<td><strong>'+esc((p.clientes&&p.clientes.usuario)||String(p.cliente_id)||'&mdash;')+'</strong></td>'+
+        '<td><strong>'+esc((p.clientes&&p.clientes.usuario)||String(p.cliente_id)||'—')+'</strong></td>'+
         '<td><strong style="color:var(--accent);">'+Number(p.monto||0).toFixed(2)+'</strong></td>'+
         '<td><span class="chip">'+esc(p.moneda||'BOB')+'</span></td>'+
-        '<td><span class="badge default">'+esc(p.metodo||'&mdash;')+'</span></td>'+
-        '<td><span style="font-size:12px;color:var(--text-muted);">'+esc(p.referencia||'&mdash;')+'</span></td>'+
+        '<td><span class="badge default">'+esc(p.metodo||'—')+'</span></td>'+
+        '<td><span style="font-size:12px;color:var(--text-muted);">'+esc(p.referencia||'—')+'</span></td>'+
         '<td>'+fmtDT(p.fecha_pago)+'</td>'+
-        '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(p.notas||'&mdash;')+'</span></td>'+
+        '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(p.notas||'—')+'</span></td>'+
       '</tr>';
     }).join('');
   }catch(e){ toast('Error pagos: '+e.message,'error'); }
@@ -869,13 +1439,13 @@ async function loadPagos(){
 /* ── LOGS ── */
 var ALL_LOG=[];
 async function loadLogs(){
-  $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x23F3;</div><p>Cargando...</p></div></td></tr>';
+  $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr>';
   try{
     var r=await api('listar_logs');
     ALL_LOG=r.logs||[];
     renderLogs();
   }catch(e){
-    $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x1F4CB;</div><p style="color:var(--text-muted);">Agrega la acci\u00f3n <code>listar_logs</code> a la Edge Function admin.</p></div></td></tr>';
+    $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><p style="color:var(--text-muted);">Agrega la acción <code>listar_logs</code> a la Edge Function admin.</p></div></td></tr>';
   }
 }
 function renderLogs(){
@@ -885,15 +1455,15 @@ function renderLogs(){
     var mr=!rf||l.resultado===rf||(rf==='revocacion'&&l.accion==='revocacion')||(rf==='migracion'&&l.accion==='migracion');
     return mq&&mr;
   });
-  if(!f.length){ $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x1F50D;</div><p>Sin resultados</p></div></td></tr>'; return; }
+  if(!f.length){ $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><p>Sin resultados</p></div></td></tr>'; return; }
   var cols={exitoso:'var(--accent)',fallido:'var(--danger)',bloqueado:'var(--warning)',masiva:'var(--info)',otro_dispositivo:'var(--warning)'};
   $('log-tb').innerHTML=f.map(function(l){
     return '<tr>'+
       '<td><span class="chip">#'+l.id+'</span></td>'+
-      '<td>'+(l.cliente_id?'<span class="chip">#'+l.cliente_id+'</span>':'&mdash;')+'</td>'+
-      '<td>'+esc(l.accion||'&mdash;')+'</td>'+
-      '<td><span style="color:'+(cols[l.resultado]||'var(--text-muted)')+';font-weight:600;">'+esc(l.resultado||'&mdash;')+'</span></td>'+
-      '<td><span style="font-family:monospace;font-size:11px;">'+esc(l.ip||'&mdash;')+'</span></td>'+
+      '<td>'+(l.cliente_id?'<span class="chip">#'+l.cliente_id+'</span>':'—')+'</td>'+
+      '<td>'+esc(l.accion||'—')+'</td>'+
+      '<td><span style="color:'+(cols[l.resultado]||'var(--text-muted)')+';font-weight:600;">'+esc(l.resultado||'—')+'</span></td>'+
+      '<td><span style="font-family:monospace;font-size:11px;">'+esc(l.ip||'—')+'</span></td>'+
       '<td>'+fmtDT(l.fecha)+'</td>'+
     '</tr>';
   }).join('');
