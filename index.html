@@ -86,6 +86,7 @@
     .badge.reserva { background: var(--info-dim); color: var(--info); }
     .badge.renovada { background: var(--info-dim); color: var(--info); }
     .badge.revocado { background: var(--danger-dim); color: var(--danger); }
+    .badge.migracion { background: var(--info-dim); color: var(--info); }
     .badge.default { background: rgba(255,255,255,0.08); color: var(--text-muted); }
 
     /* FORMS */
@@ -110,6 +111,8 @@
     .btn-success:hover:not(:disabled) { background: var(--accent); color: #fff; }
     .btn-info { background: var(--info-dim); color: var(--info); border: 1px solid rgba(59,130,246,0.3); }
     .btn-info:hover:not(:disabled) { background: var(--info); color: #fff; }
+    .btn-migrate { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+    .btn-migrate:hover:not(:disabled) { background: var(--info); color: #fff; border-color: var(--info); }
     .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
     .btn-ghost:hover:not(:disabled) { background: var(--card); color: var(--text); border-color: var(--border-hover); }
     .btn-sm { padding: 5px 10px; font-size: 12px; }
@@ -317,6 +320,7 @@
               <option value="fallido">Fallidos</option>
               <option value="bloqueado">Bloqueados</option>
               <option value="revocacion">Revocaciones</option>
+              <option value="migracion">Migraciones</option>
             </select>
           </div>
           <div class="table-wrap">
@@ -413,6 +417,33 @@
   </div>
 </div>
 
+<!-- 🔄 Confirmar Migrar -->
+<div class="modal-overlay hidden" id="m-mig">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">&#x1F504; Migrar a otra cuenta maestra</div>
+      <button class="modal-close" onclick="closeModal('m-mig')">&#x00D7;</button>
+    </div>
+    <p id="mig-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></p>
+    <div class="field">
+      <label>Nueva cuenta maestra</label>
+      <select id="mig-cuenta" class="sel" style="width:100%;"></select>
+    </div>
+    <p style="color:var(--warning);font-size:12px;margin-top:14px;line-height:1.6;padding:10px;background:var(--warning-dim);border-radius:8px;border:1px solid rgba(245,158,11,0.3);">
+      &#x26A0;&#xFE0F; El cliente ser&aacute; desconectado de ChatGPT y reconectado con la nueva cuenta.
+      <br><br>
+      El proceso es autom&aacute;tico y ocurre en la extensi&oacute;n (en segundos si est&aacute; activo, o m&aacute;ximo 15 min).
+      <br><br>
+      Durante la migraci&oacute;n <strong>no hay consumo de base de datos</strong>.
+    </p>
+    <div id="mig-alert" class="alert-box error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-mig')">Cancelar</button>
+      <button class="btn btn-migrate" id="mig-btn" onclick="doMigrar()">&#x1F504; Migrar ahora</button>
+    </div>
+  </div>
+</div>
+
 <!-- Nueva Cuenta Maestra -->
 <div class="modal-overlay hidden" id="m-new-cm">
   <div class="modal">
@@ -438,7 +469,7 @@
 
 <script>
 'use strict';
-var API = '', TOK = '', PENDING = null, PENDING_REV = null;
+var API = '', TOK = '', PENDING = null, PENDING_REV = null, PENDING_MIG = null;
 
 /* ── HELPERS ── */
 function $(id){ return document.getElementById(id); }
@@ -448,7 +479,7 @@ function fmtDT(s){ if(!s)return'&mdash;'; var d=new Date(s); return isNaN(d)?esc
 
 function badge(v){
   var c=(v||'').toLowerCase().replace(/[^a-z]/g,'');
-  var L={activo:'Activo',activa:'Activa',vencido:'Vencido',vencida:'Vencida',suspendido:'Suspendido',cancelado:'Cancelado',cancelada:'Cancelada',baneada:'Baneada',reserva:'Reserva',renovada:'Renovada',revocado:'Revocado'};
+  var L={activo:'Activo',activa:'Activa',vencido:'Vencido',vencida:'Vencida',suspendido:'Suspendido',cancelado:'Cancelado',cancelada:'Cancelada',baneada:'Baneada',reserva:'Reserva',renovada:'Renovada',revocado:'Revocado',migracion:'Migrado'};
   return '<span class="badge '+c+'">'+(L[c]||esc(v)||'&mdash;')+'</span>';
 }
 
@@ -597,6 +628,7 @@ function renderCli(){
     var canSus=est==='activo'||est==='vencido';
     var canRea=est==='suspendido'||est==='vencido'||est==='cancelado';
     var canRev=est!=='cancelado';
+    var canMig=est!=='cancelado' && est!=='suspendido';
     return '<tr>'+
       '<td><span class="chip">#'+c.id+'</span></td>'+
       '<td><strong>'+esc(c.usuario)+'</strong></td>'+
@@ -608,8 +640,9 @@ function renderCli(){
       '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.cuenta_maestra_email||'&mdash;')+'</span></td>'+
       '<td><div class="action-row">'+
         '<button class="btn btn-info btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')" title="Renovar">&#x21BB;</button>'+
+        (canMig?'<button class="btn btn-migrate btn-sm" onclick="abrirMigrar('+c.id+',\''+esc(c.usuario)+'\')" title="Migrar a otra cuenta maestra">&#x1F504;</button>':'')+
         (canSus?'<button class="btn btn-danger btn-sm" onclick="abrirSuspender('+c.id+',\''+esc(c.usuario)+'\')" title="Suspender licencia">Suspender</button>':'')+
-        (canRev?'<button class="btn btn-danger btn-sm" onclick="abrirRevocar('+c.id+',\''+esc(c.usuario)+'\')" title="Forzar cierre de sesión inmediato" style="background:rgba(239,68,68,0.3);">&#x1F512; Revocar</button>':'')+
+        (canRev?'<button class="btn btn-danger btn-sm" onclick="abrirRevocar('+c.id+',\''+esc(c.usuario)+'\')" title="Forzar cierre de sesión" style="background:rgba(239,68,68,0.3);">&#x1F512; Revocar</button>':'')+
         (canRea?'<button class="btn btn-success btn-sm" onclick="doReactivar('+c.id+',\''+esc(c.usuario)+'\')">Reactivar</button>':'')+
       '</div></td>'+
     '</tr>';
@@ -688,6 +721,57 @@ async function doRevocar(){
     loadClientes(); loadDashboard();
   }catch(e){toast('Error al revocar: '+e.message,'error');}
   finally{btn.disabled=false; btn.innerHTML='&#x1F512; Revocar ahora';}
+}
+
+/* ── 🔄 MIGRAR CUENTA ── */
+async function abrirMigrar(id,usuario){
+  PENDING_MIG={id:id,usuario:usuario};
+  $('mig-info').innerHTML='Mover a <strong>'+esc(usuario)+'</strong> (ID: '+id+') a otra cuenta maestra.';
+  hideA('mig-alert');
+
+  try{
+    var r=await api('listar_cuentas');
+    var cuentas=(r.cuentas||[]).filter(function(c){ return c.estado==='activa'; });
+    var sel=$('mig-cuenta');
+    if(!cuentas.length){
+      sel.innerHTML='<option value="">No hay cuentas activas disponibles</option>';
+    }else{
+      sel.innerHTML=cuentas.map(function(c){
+        return '<option value="'+c.id+'">'+esc(c.email)+' (#'+c.id+')</option>';
+      }).join('');
+    }
+  }catch(e){
+    showA('mig-alert','Error cargando cuentas: '+e.message);
+  }
+
+  openModal('m-mig');
+}
+
+async function doMigrar(){
+  if(!PENDING_MIG)return;
+  var nuevaId=parseInt($('mig-cuenta').value);
+  if(!nuevaId){ showA('mig-alert','Selecciona una cuenta maestra.'); return; }
+
+  var btn=$('mig-btn');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div>&nbsp;Migrando...';
+  hideA('mig-alert');
+
+  try{
+    await api('migrar_cuenta','POST',{
+      cliente_id:PENDING_MIG.id,
+      nueva_cuenta_id:nuevaId
+    });
+    closeModal('m-mig');
+    toast('\uD83D\uDD04 Migraci\u00f3n de "'+PENDING_MIG.usuario+'" iniciada. Se aplicar\u00e1 en \u226415 min.','info');
+    loadClientes();
+    loadDashboard();
+  }catch(e){
+    showA('mig-alert',e.message);
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='&#x1F504; Migrar ahora';
+  }
 }
 
 /* ── REVOCAR TODOS (emergencia) ── */
@@ -791,14 +875,14 @@ async function loadLogs(){
     ALL_LOG=r.logs||[];
     renderLogs();
   }catch(e){
-    $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x1F4CB;</div><p style="color:var(--text-muted);">Agrega la acci\u00f3n <code>listar_logs</code> a la Edge Function admin para ver los logs.</p></div></td></tr>';
+    $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x1F4CB;</div><p style="color:var(--text-muted);">Agrega la acci\u00f3n <code>listar_logs</code> a la Edge Function admin.</p></div></td></tr>';
   }
 }
 function renderLogs(){
   var q=$('q-log').value.toLowerCase(), rf=$('f-res').value;
   var f=ALL_LOG.filter(function(l){
     var mq=!q||(l.accion||'').toLowerCase().includes(q)||(l.ip||'').toLowerCase().includes(q)||String(l.cliente_id||'').includes(q);
-    var mr=!rf||l.resultado===rf||(rf==='revocacion'&&l.accion==='revocacion');
+    var mr=!rf||l.resultado===rf||(rf==='revocacion'&&l.accion==='revocacion')||(rf==='migracion'&&l.accion==='migracion');
     return mq&&mr;
   });
   if(!f.length){ $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="icon">&#x1F50D;</div><p>Sin resultados</p></div></td></tr>'; return; }
