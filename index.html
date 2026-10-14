@@ -13,6 +13,8 @@
       --danger: #ef4444; --danger-dim: rgba(239,68,68,0.15);
       --warning: #f59e0b; --warning-dim: rgba(245,158,11,0.15);
       --info: #3b82f6; --info-dim: rgba(59,130,246,0.15);
+      --gemini: #4285f4; --gemini-dim: rgba(66,133,244,0.15);
+      --gpt: #10a37f; --gpt-dim: rgba(16,163,127,0.15);
       --text: #ececf1; --text-muted: #8e8ea0; --text-dim: #565669;
       --radius: 12px; --radius-sm: 8px;
     }
@@ -54,43 +56,15 @@
     .page-title { font-size: 20px; font-weight: 700; }
     .page-sub { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
 
-    /* BANNER DE PROGRESO DE MIGRACIÓN MASIVA */
-    .migration-banner {
-      display: none;
-      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(16,163,127,0.1));
-      border: 1px solid rgba(59,130,246,0.35);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      gap: 16px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+    /* BANNER DE MIGRACIÓN */
+    .migration-banner { display: none; background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(16,163,127,0.1)); border: 1px solid rgba(59,130,246,0.35); border-radius: var(--radius); padding: 16px 20px; gap: 16px; align-items: center; flex-wrap: wrap; }
     .migration-banner.visible { display: flex; }
-    .migration-banner-icon {
-      width: 40px; height: 40px;
-      background: rgba(59,130,246,0.2);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: #60a5fa;
-      flex-shrink: 0;
-    }
+    .migration-banner-icon { width: 40px; height: 40px; background: rgba(59,130,246,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #60a5fa; flex-shrink: 0; }
     .migration-banner-content { flex: 1; min-width: 200px; }
     .migration-banner-title { font-weight: 700; font-size: 14px; color: #fff; margin-bottom: 3px; }
     .migration-banner-sub { font-size: 12px; color: #93c5fd; }
-    .migration-banner-progress {
-      flex-basis: 100%;
-      height: 4px;
-      background: rgba(0,0,0,0.3);
-      border-radius: 99px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    .migration-banner-progress > div {
-      height: 100%;
-      background: linear-gradient(90deg, #3b82f6, #10a37f);
-      border-radius: 99px;
-      transition: width 0.5s ease;
-    }
+    .migration-banner-progress { flex-basis: 100%; height: 4px; background: rgba(0,0,0,0.3); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+    .migration-banner-progress > div { height: 100%; background: linear-gradient(90deg, #3b82f6, #10a37f); border-radius: 99px; transition: width 0.5s ease; }
 
     /* CARDS */
     .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
@@ -118,39 +92,48 @@
 
     /* CHECKBOX */
     .checkbox-wrap { display: flex; align-items: center; justify-content: center; }
-    .checkbox {
-      appearance: none; -webkit-appearance: none;
-      width: 16px; height: 16px;
-      border: 1.5px solid var(--border-hover);
-      border-radius: 4px;
-      cursor: pointer; position: relative;
-      transition: all 0.15s;
-      background: transparent; flex-shrink: 0;
-    }
+    .checkbox { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; border: 1.5px solid var(--border-hover); border-radius: 4px; cursor: pointer; position: relative; transition: all 0.15s; background: transparent; flex-shrink: 0; }
     .checkbox:hover { border-color: var(--info); }
     .checkbox:checked { background: var(--info); border-color: var(--info); }
-    .checkbox:checked::after {
-      content: '';
-      position: absolute;
-      left: 4px; top: 1px;
-      width: 5px; height: 9px;
-      border: solid #fff;
-      border-width: 0 2px 2px 0;
-      transform: rotate(45deg);
+    .checkbox:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+    /* PRODUCT PILLS (checkboxes bonitos) */
+    .product-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+    .product-pill {
+      flex: 1;
+      min-width: 130px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
     }
+    .product-pill:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.05); }
+    .product-pill.checked { border-color: var(--accent); background: var(--accent-dim); }
+    .product-pill.checked.gpt { border-color: var(--gpt); background: var(--gpt-dim); }
+    .product-pill.checked.gemini { border-color: var(--gemini); background: var(--gemini-dim); }
+    .product-pill input[type="checkbox"] { display: none; }
+    .product-pill-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 800; font-size: 13px; }
+    .product-pill.gpt .product-pill-icon { background: rgba(16,163,127,0.2); color: var(--gpt); }
+    .product-pill.gemini .product-pill-icon { background: rgba(66,133,244,0.2); color: var(--gemini); }
+    .product-pill-content { display: flex; flex-direction: column; gap: 2px; }
+    .product-pill-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .product-pill-desc { font-size: 11px; color: var(--text-muted); }
+
+    /* PRODUCT BADGES (en tabla) */
+    .product-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+    .product-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+    .product-badge.gpt { background: var(--gpt-dim); color: var(--gpt); }
+    .product-badge.gemini { background: var(--gemini-dim); color: var(--gemini); }
+    .product-badge.none { background: rgba(255,255,255,0.05); color: var(--text-dim); }
 
     /* BULK TOOLBAR */
-    .bulk-toolbar {
-      display: none;
-      background: var(--info-dim);
-      border: 1px solid rgba(59,130,246,0.35);
-      border-radius: var(--radius-sm);
-      padding: 10px 16px;
-      margin-bottom: 14px;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    .bulk-toolbar { display: none; background: var(--info-dim); border: 1px solid rgba(59,130,246,0.35); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 14px; align-items: center; gap: 12px; flex-wrap: wrap; }
     .bulk-toolbar.visible { display: flex; }
     .bulk-count { font-weight: 600; font-size: 13px; color: #93c5fd; }
     .bulk-toolbar .btn { padding: 6px 12px; font-size: 12px; }
@@ -254,7 +237,7 @@
     .batch-preview-row span:last-child { font-weight: 600; color: #fff; }
     .batch-preview-total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; }
 
-    @media (max-width: 768px) { .sidebar { display: none; } .form-2 { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) { .sidebar { display: none; } .form-2 { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: 1fr 1fr; } .product-pills { flex-direction: column; } }
   </style>
 </head>
 <body>
@@ -268,7 +251,7 @@
       </svg>
     </div>
     <h1>Panel Admin</h1>
-    <p class="sub">GPT Asistente — Control de suscripciones y accesos</p>
+    <p class="sub">Control de suscripciones y accesos</p>
     <div class="form-grid" style="margin-bottom:16px;">
       <div class="field">
         <label>URL Supabase Functions</label>
@@ -291,7 +274,7 @@
 <!-- ========== APP ========== -->
 <div id="app">
   <div class="topbar">
-    <div class="topbar-brand"><span class="dot"></span>GPT Asistente — Admin</div>
+    <div class="topbar-brand"><span class="dot"></span>Panel Admin</div>
     <div class="topbar-right">
       <span class="topbar-url" id="t-url"></span>
       <button class="btn btn-ghost btn-sm" id="t-refresh">
@@ -336,7 +319,7 @@
     <!-- CONTENT -->
     <main class="content">
 
-      <!-- BANNER DE MIGRACIÓN MASIVA ACTIVA -->
+      <!-- BANNER MIGRACIÓN MASIVA -->
       <div class="migration-banner" id="migrationBanner">
         <div class="migration-banner-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
@@ -346,10 +329,7 @@
           <div class="migration-banner-sub" id="migBannerSub">Preparando...</div>
           <div class="migration-banner-progress"><div id="migBannerBar" style="width: 0%"></div></div>
         </div>
-        <button class="btn btn-danger btn-sm" onclick="cancelarBatchActivo()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-          Cancelar
-        </button>
+        <button class="btn btn-danger btn-sm" onclick="cancelarBatchActivo()">Cancelar</button>
       </div>
 
       <!-- DASHBOARD -->
@@ -357,61 +337,21 @@
         <div class="page-header">
           <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-ts"></div></div>
           <div class="action-row">
-            <button class="btn btn-danger btn-sm" onclick="revocarTodos()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              Revocar todos
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
-              Actualizar
-            </button>
+            <button class="btn btn-danger btn-sm" onclick="revocarTodos()">Revocar todos</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">Actualizar</button>
           </div>
         </div>
         <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-            <div class="stat-label">Clientes Activos</div>
-            <div class="stat-value green" id="s1">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            <div class="stat-label">Vencidos</div>
-            <div class="stat-value red" id="s2">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-            <div class="stat-label">Suspendidos</div>
-            <div class="stat-value yellow" id="s3">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            <div class="stat-label">Vencen esta semana</div>
-            <div class="stat-value yellow" id="s4">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-            <div class="stat-label">Ingresos del mes</div>
-            <div class="stat-value blue" id="s5">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
-            <div class="stat-label">Cuentas Activas</div>
-            <div class="stat-value green" id="s6">—</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
-            <div class="stat-label">Cuentas Baneadas</div>
-            <div class="stat-value red" id="s7">—</div>
-          </div>
+          <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-label">Clientes Activos</div><div class="stat-value green" id="s1">—</div></div>
+          <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-label">Vencidos</div><div class="stat-value red" id="s2">—</div></div>
+          <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-label">Suspendidos</div><div class="stat-value yellow" id="s3">—</div></div>
+          <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="stat-label">Vencen esta semana</div><div class="stat-value yellow" id="s4">—</div></div>
+          <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="stat-label">Ingresos del mes</div><div class="stat-value blue" id="s5">—</div></div>
+          <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div><div class="stat-label">Cuentas Activas</div><div class="stat-value green" id="s6">—</div></div>
+          <div class="stat-card"><div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><div class="stat-label">Cuentas Baneadas</div><div class="stat-value red" id="s7">—</div></div>
         </div>
         <div class="card">
-          <div class="card-title">
-            <div class="card-title-icon">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              Próximos a vencer (≤ 5 días)
-            </div>
-            <button class="btn btn-ghost btn-sm" onclick="switchPage('clientes')">Ver todos →</button>
-          </div>
+          <div class="card-title">Próximos a vencer (≤ 5 días) <button class="btn btn-ghost btn-sm" onclick="switchPage('clientes')">Ver todos →</button></div>
           <div id="proximos-wrap"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></div>
         </div>
       </div>
@@ -421,14 +361,15 @@
         <div class="page-header">
           <div><div class="page-title">Clientes</div><div class="page-sub" id="clientes-ct"></div></div>
           <div class="action-row">
+            <select class="sel" id="f-prod-cli" style="margin-right:4px;">
+              <option value="">Todos los productos</option>
+              <option value="chatgpt">Solo ChatGPT</option>
+              <option value="gemini">Solo Gemini</option>
+            </select>
             <button class="btn btn-ghost btn-sm" onclick="loadClientes()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
             </button>
-            <button class="btn btn-migrate btn-sm" onclick="abrirMigrarTodos()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
-              Migrar todos
-            </button>
-            <button class="btn btn-primary" onclick="openModal('m-new-c')">
+            <button class="btn btn-primary" onclick="abrirNuevoCliente()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Nuevo cliente
             </button>
@@ -446,17 +387,9 @@
             </select>
           </div>
 
-          <!-- BULK TOOLBAR -->
           <div class="bulk-toolbar" id="bulkToolbar">
             <span class="bulk-count" id="bulkCount">0 seleccionados</span>
-            <button class="btn btn-migrate btn-sm" onclick="abrirMigrarSeleccionados()">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
-              Migrar seleccionados
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="revocarSeleccionados()">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Revocar seleccionados
-            </button>
+            <button class="btn btn-danger btn-sm" onclick="revocarSeleccionados()">Revocar seleccionados</button>
             <button class="btn btn-ghost btn-sm" onclick="limpiarSeleccion()">Cancelar</button>
           </div>
 
@@ -465,7 +398,7 @@
               <thead>
                 <tr>
                   <th style="width:36px;"><div class="checkbox-wrap"><input type="checkbox" class="checkbox" id="selectAllCli" onchange="toggleSelectAll(this)"></div></th>
-                  <th>ID</th><th>Usuario</th><th>Nombre</th><th>Estado</th><th>Suscripción</th><th>Vencimiento</th><th>Días</th><th>Cuenta Maestra</th><th>Acciones</th>
+                  <th>ID</th><th>Usuario</th><th>Nombre</th><th>Estado</th><th>Productos</th><th>Vencimiento</th><th>Días</th><th>Cuenta Maestra</th><th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="cli-tb"><tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
@@ -479,6 +412,11 @@
         <div class="page-header">
           <div><div class="page-title">Cuentas Maestras</div><div class="page-sub">Credenciales compartidas</div></div>
           <div class="action-row">
+            <select class="sel" id="f-prod-cm" style="margin-right:4px;">
+              <option value="">Todos</option>
+              <option value="chatgpt">ChatGPT</option>
+              <option value="gemini">Gemini</option>
+            </select>
             <button class="btn btn-ghost btn-sm" onclick="loadCuentas()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
             </button>
@@ -491,8 +429,8 @@
         <div class="card" style="padding:16px;">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>ID</th><th>Producto</th><th>Email</th><th>Estado</th><th>TOTP</th><th>Alta</th><th>Últ. verif.</th><th>OK?</th><th>Notas</th><th>Acciones</th></tr></thead>
-              <tbody id="cm-tb"><tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
+              <thead><tr><th>ID</th><th>Producto</th><th>Email</th><th>Estado</th><th>TOTP</th><th>Alta</th><th>Notas</th><th>Acciones</th></tr></thead>
+              <tbody id="cm-tb"><tr><td colspan="8"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
             </table>
           </div>
         </div>
@@ -502,9 +440,7 @@
       <div class="page" id="page-pagos">
         <div class="page-header">
           <div><div class="page-title">Historial de Pagos</div><div class="page-sub">Últimos 100 pagos</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="loadPagos()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
-          </button>
+          <button class="btn btn-ghost btn-sm" onclick="loadPagos()">Actualizar</button>
         </div>
         <div class="card" style="padding:16px;">
           <div class="table-wrap">
@@ -519,10 +455,8 @@
       <!-- LOGS -->
       <div class="page" id="page-logs">
         <div class="page-header">
-          <div><div class="page-title">Logs de Acceso</div><div class="page-sub">Actividad reciente de clientes</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="loadLogs()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
-          </button>
+          <div><div class="page-title">Logs de Acceso</div><div class="page-sub">Actividad reciente</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="loadLogs()">Actualizar</button>
         </div>
         <div class="card" style="padding:16px;">
           <div class="search-bar">
@@ -538,7 +472,7 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>ID</th><th>Cliente</th><th>Acción</th><th>Resultado</th><th>IP</th><th>Fecha</th></tr></thead>
+              <thead><tr><th>ID</th><th>Cliente</th><th>Acción</th><th>Resultado</th><th>Notas</th><th>Fecha</th></tr></thead>
               <tbody id="log-tb"><tr><td colspan="6"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr></tbody>
             </table>
           </div>
@@ -566,12 +500,36 @@
     <div class="form-grid">
       <div class="form-grid form-2" style="display:grid;">
         <div class="field"><label>Usuario *</label><input type="text" id="nc-u" placeholder="ej: juan123" autocomplete="off"></div>
-        <div class="field"><label>Contraseña *</label><input type="text" id="nc-p" placeholder="Contraseña de acceso" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
+        <div class="field"><label>Contraseña *</label><input type="text" id="nc-p" placeholder="Contraseña" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
       </div>
       <div class="form-grid form-2" style="display:grid;">
         <div class="field"><label>Nombre completo</label><input type="text" id="nc-n" placeholder="Juan Pérez" autocomplete="off"></div>
         <div class="field"><label>Email</label><input type="email" id="nc-e" placeholder="juan@ejemplo.com" autocomplete="off"></div>
       </div>
+
+      <!-- 🆕 SELECCIÓN DE PRODUCTOS -->
+      <div class="field">
+        <label>Productos a contratar *</label>
+        <div class="product-pills">
+          <label class="product-pill gpt" id="nc-pill-gpt">
+            <input type="checkbox" id="nc-prod-gpt" value="chatgpt" onchange="togglePill(this, 'nc-pill-gpt')">
+            <div class="product-pill-icon">GP</div>
+            <div class="product-pill-content">
+              <span class="product-pill-title">ChatGPT</span>
+              <span class="product-pill-desc">Acceso a ChatGPT Plus</span>
+            </div>
+          </label>
+          <label class="product-pill gemini" id="nc-pill-gemini">
+            <input type="checkbox" id="nc-prod-gemini" value="gemini" onchange="togglePill(this, 'nc-pill-gemini')">
+            <div class="product-pill-icon">GE</div>
+            <div class="product-pill-content">
+              <span class="product-pill-title">Gemini Flow</span>
+              <span class="product-pill-desc">Google Gemini Ultra</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
       <div class="field"><label>Días de suscripción</label><input type="number" id="nc-d" value="30" min="1" max="365"></div>
     </div>
     <div id="nc-alert" class="alert-box error"></div>
@@ -582,19 +540,84 @@
   </div>
 </div>
 
+<!-- 🆕 Editar Cliente -->
+<div class="modal-overlay hidden" id="m-edit-c">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editar Cliente
+      </div>
+      <button class="modal-close" onclick="closeModal('m-edit-c')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-grid">
+      <div id="ec-info" style="color:var(--text-muted);font-size:12px;padding:10px 14px;background:rgba(255,255,255,0.04);border-radius:8px;"></div>
+
+      <div class="form-grid form-2" style="display:grid;">
+        <div class="field"><label>Nombre completo</label><input type="text" id="ec-n" placeholder="Nombre" autocomplete="off"></div>
+        <div class="field"><label>Email</label><input type="email" id="ec-e" placeholder="Email" autocomplete="off"></div>
+      </div>
+
+      <div class="field"><label>Cambiar contraseña (opcional)</label><input type="text" id="ec-p" placeholder="Dejar vacío para no cambiar" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
+
+      <!-- 🆕 PRODUCTOS ACTUALES + AGREGAR NUEVOS -->
+      <div class="field">
+        <label>Productos asignados</label>
+        <div class="product-pills">
+          <label class="product-pill gpt" id="ec-pill-gpt">
+            <input type="checkbox" id="ec-prod-gpt" value="chatgpt" onchange="togglePill(this, 'ec-pill-gpt')">
+            <div class="product-pill-icon">GP</div>
+            <div class="product-pill-content">
+              <span class="product-pill-title">ChatGPT</span>
+              <span class="product-pill-desc">Acceso a ChatGPT Plus</span>
+            </div>
+          </label>
+          <label class="product-pill gemini" id="ec-pill-gemini">
+            <input type="checkbox" id="ec-prod-gemini" value="gemini" onchange="togglePill(this, 'ec-pill-gemini')">
+            <div class="product-pill-icon">GE</div>
+            <div class="product-pill-content">
+              <span class="product-pill-title">Gemini Flow</span>
+              <span class="product-pill-desc">Google Gemini Ultra</span>
+            </div>
+          </label>
+        </div>
+        <span style="font-size:11px;color:var(--text-dim);margin-top:4px;">
+          Agregar un producto crea una nueva suscripción con 30 días desde hoy. Quitar un producto cancela la suscripción existente.
+        </span>
+      </div>
+
+      <div class="field" id="ec-dias-wrap">
+        <label>Días de las nuevas suscripciones</label>
+        <input type="number" id="ec-d" value="30" min="1" max="365">
+      </div>
+    </div>
+    <div id="ec-alert" class="alert-box error"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-edit-c')">Cancelar</button>
+      <button class="btn btn-primary" id="ec-btn" onclick="doEditarCliente()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
 <!-- Renovar -->
 <div class="modal-overlay hidden" id="m-ren">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
-        Renovar Suscripción
-      </div>
+      <div class="modal-title">Renovar Suscripción</div>
       <button class="modal-close" onclick="closeModal('m-ren')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div id="ren-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Producto a renovar</label>
+      <select id="ren-prod" class="sel" style="width:100%;">
+        <option value="chatgpt">ChatGPT</option>
+        <option value="gemini">Gemini Flow</option>
+      </select>
+    </div>
     <div class="form-grid">
       <div class="form-grid form-2" style="display:grid;">
         <div class="field"><label>Días a agregar</label><input type="number" id="ren-d" value="30" min="1" max="365"></div>
@@ -618,15 +641,7 @@
 <!-- Suspender -->
 <div class="modal-overlay hidden" id="m-sus">
   <div class="modal" style="max-width:400px;">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Suspender cliente
-      </div>
-      <button class="modal-close" onclick="closeModal('m-sus')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Suspender cliente</div><button class="modal-close" onclick="closeModal('m-sus')">×</button></div>
     <p id="sus-info" style="color:var(--text-muted);font-size:13px;margin-bottom:10px;"></p>
     <p style="color:var(--danger);font-size:13px;">El cliente perderá acceso en la próxima verificación (máx. 15 min).</p>
     <div class="modal-footer">
@@ -638,22 +653,19 @@
 
 <!-- Revocar -->
 <div class="modal-overlay hidden" id="m-rev">
-  <div class="modal" style="max-width:440px;">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Revocar acceso
-      </div>
-      <button class="modal-close" onclick="closeModal('m-rev')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header"><div class="modal-title">Revocar acceso</div><button class="modal-close" onclick="closeModal('m-rev')">×</button></div>
     <p id="rev-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;"></p>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Producto a revocar</label>
+      <select id="rev-prod" class="sel" style="width:100%;">
+        <option value="chatgpt">ChatGPT</option>
+        <option value="gemini">Gemini Flow</option>
+      </select>
+    </div>
     <p style="color:var(--danger);font-size:13px;line-height:1.6;">
-      El cliente será expulsado <strong>inmediatamente</strong> de ChatGPT.
+      El cliente será expulsado <strong>inmediatamente</strong> de la plataforma seleccionada.
       Su sesión se cerrará en segundos si está activo, o en máximo 15 min.
-      <br><br>
-      <strong>Podrá volver a entrar</strong> con sus credenciales (a menos que también lo suspendas).
     </p>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-rev')">Cancelar</button>
@@ -662,26 +674,24 @@
   </div>
 </div>
 
-<!-- Migrar individual o seleccionados -->
+<!-- Migrar individual -->
 <div class="modal-overlay hidden" id="m-mig">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
-        Migrar a otra cuenta maestra
-      </div>
-      <button class="modal-close" onclick="closeModal('m-mig')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Migrar a otra cuenta maestra</div><button class="modal-close" onclick="closeModal('m-mig')">×</button></div>
     <p id="mig-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></p>
+    <div class="field" style="margin-bottom:14px;">
+      <label>Producto</label>
+      <select id="mig-prod" class="sel" style="width:100%;" onchange="cargarCuentasMigrar()">
+        <option value="chatgpt">ChatGPT</option>
+        <option value="gemini">Gemini Flow</option>
+      </select>
+    </div>
     <div class="field">
       <label>Nueva cuenta maestra</label>
       <select id="mig-cuenta" class="sel" style="width:100%;"></select>
     </div>
     <p style="color:var(--warning);font-size:12px;margin-top:14px;line-height:1.6;padding:10px;background:var(--warning-dim);border-radius:8px;border:1px solid rgba(245,158,11,0.3);">
-      El cliente será desconectado de ChatGPT y reconectado con la nueva cuenta.
-      El proceso es automático (segundos si está activo, o máximo 15 min).
+      El cliente será desconectado y reconectado con la nueva cuenta. Automático en ≤15 min.
     </p>
     <div id="mig-alert" class="alert-box error"></div>
     <div class="modal-footer">
@@ -691,67 +701,21 @@
   </div>
 </div>
 
-<!-- Migrar masiva -->
-<div class="modal-overlay hidden" id="m-mig-batch">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
-        Migración masiva
-      </div>
-      <button class="modal-close" onclick="closeModal('m-mig-batch')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <p id="migb-info" style="color:var(--text-muted);font-size:13px;margin-bottom:14px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;"></p>
-    <div class="field">
-      <label>Nueva cuenta maestra</label>
-      <select id="migb-cuenta" class="sel" style="width:100%;"></select>
-    </div>
-    <div class="field" style="margin-top:14px;">
-      <label>Intervalo entre migraciones (minutos)</label>
-      <input type="number" id="migb-intervalo" value="20" min="5" max="180" step="5">
-      <span style="font-size:11px;color:var(--text-dim);margin-top:4px;">Mínimo 5 min · Máximo 180 min · Recomendado: 20 min</span>
-    </div>
-
-    <div class="batch-preview">
-      <div class="batch-preview-row"><span>Clientes a migrar</span><span id="migb-total">0</span></div>
-      <div class="batch-preview-row"><span>Intervalo</span><span id="migb-intervalo-txt">20 min</span></div>
-      <div class="batch-preview-row batch-preview-total"><span>Tiempo estimado total</span><span id="migb-tiempo">0 min</span></div>
-    </div>
-
-    <p style="color:var(--warning);font-size:12px;margin-top:14px;line-height:1.6;padding:10px;background:var(--warning-dim);border-radius:8px;border:1px solid rgba(245,158,11,0.3);">
-      La migración se ejecutará de forma automática en segundo plano.
-      Puedes cerrar esta pestaña: el proceso continuará en el servidor.
-    </p>
-
-    <div id="migb-alert" class="alert-box error"></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('m-mig-batch')">Cancelar</button>
-      <button class="btn btn-migrate" id="migb-btn" onclick="doMigrarBatch()">Iniciar migración masiva</button>
-    </div>
-  </div>
-</div>
-
 <!-- Nueva Cuenta Maestra -->
 <div class="modal-overlay hidden" id="m-new-cm">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-        Nueva Cuenta Maestra
-      </div>
-      <button class="modal-close" onclick="closeModal('m-new-cm')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
+    <div class="modal-header"><div class="modal-title">Nueva Cuenta Maestra</div><button class="modal-close" onclick="closeModal('m-new-cm')">×</button></div>
     <div class="form-grid">
       <div class="field"><label>Producto</label>
-        <select id="cm-prod"><option value="chatgpt">ChatGPT</option><option value="gemini">Gemini</option><option value="codex">Codex</option><option value="otro">Otro</option></select>
+        <select id="cm-prod">
+          <option value="chatgpt">ChatGPT</option>
+          <option value="gemini">Gemini Flow</option>
+          <option value="codex">Codex</option>
+        </select>
       </div>
-      <div class="field"><label>Email de la cuenta *</label><input type="email" id="cm-e" placeholder="cuenta@openai.com" autocomplete="off"></div>
-      <div class="field"><label>Contraseña de la cuenta *</label><input type="text" id="cm-p" placeholder="Contraseña de ChatGPT" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
-      <div class="field"><label>TOTP Seed (2FA) — opcional</label><input type="text" id="cm-t" placeholder="Base32 seed del autenticador" autocomplete="off"></div>
+      <div class="field"><label>Email de la cuenta *</label><input type="email" id="cm-e" placeholder="cuenta@ejemplo.com" autocomplete="off"></div>
+      <div class="field"><label>Contraseña *</label><input type="text" id="cm-p" placeholder="Contraseña de la cuenta" autocomplete="off" data-lpignore="true" data-form-type="other" style="-webkit-text-security:disc;"></div>
+      <div class="field"><label>TOTP Seed (2FA) — opcional</label><input type="text" id="cm-t" placeholder="Base32 seed (ej: JBSWY3DPEHPK3PXP)" autocomplete="off"></div>
       <div class="field"><label>Notas</label><textarea id="cm-n" placeholder="Observaciones..."></textarea></div>
     </div>
     <div id="cm-alert" class="alert-box error"></div>
@@ -766,10 +730,10 @@
 
 <script>
 'use strict';
-var API = '', TOK = '', PENDING = null, PENDING_REV = null, PENDING_MIG = null, PENDING_MIG_BATCH = null;
-var SELECCIONADOS = new Set();
-var BATCH_ACTIVO = null;
-var INTERVALO_BATCH_POLL = null;
+var API = '', TOK = '';
+var PENDING = null, PENDING_REV = null, PENDING_MIG = null, PENDING_EDIT = null;
+var BATCH_ACTIVO = null, INTERVALO_BATCH_POLL = null;
+var ALL_CLI = [], SELECCIONADOS = new Set();
 
 /* ── HELPERS ── */
 function $(id){ return document.getElementById(id); }
@@ -790,6 +754,21 @@ function diasPill(n){
   var pct=Math.max(0,Math.min(100,(n/30)*100));
   var col=n<=0?'var(--danger)':n<=5?'var(--warning)':'var(--accent)';
   return '<div class="dias-wrap"><span class="dias-pill '+cls+'">'+lbl+'</span><div class="dias-bar"><div class="dias-bar-fill" style="width:'+pct+'%;background:'+col+';"></div></div></div>';
+}
+
+function productosBadges(cliente){
+  var prods = cliente.productos || [];
+  // Si no viene array, inferir del campo producto único (compatibilidad)
+  if (!prods.length && cliente.producto) prods = [cliente.producto];
+  if (!prods.length && cliente.estado_suscripcion) prods = ['chatgpt'];
+
+  if (!prods.length) return '<span class="product-badge none">Sin productos</span>';
+
+  return '<div class="product-badges">' + prods.map(function(p){
+    var cls = p === 'gemini' ? 'gemini' : 'gpt';
+    var lbl = p === 'gemini' ? 'Gemini' : 'ChatGPT';
+    return '<span class="product-badge '+cls+'">'+lbl+'</span>';
+  }).join('') + '</div>';
 }
 
 var ICON = {
@@ -814,6 +793,13 @@ function showA(id,msg,type){
   el.textContent=msg; el.className='alert-box '+(type||'error')+' visible';
 }
 function hideA(id){ var el=$(id); if(el){el.className='alert-box';el.textContent='';} }
+
+function togglePill(checkbox, pillId){
+  var pill = $(pillId);
+  if (!pill) return;
+  if (checkbox.checked) pill.classList.add('checked');
+  else pill.classList.remove('checked');
+}
 
 async function api(accion,method,body){
   method=method||'GET';
@@ -905,18 +891,16 @@ async function loadDashboard(){
     if(!prx.length){
       wrap.innerHTML='<div class="empty-state"><p>Ningún cliente vence en los próximos 5 días</p></div>';
     }else{
-      wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>Días</th><th>Vencimiento</th><th>Acción</th></tr></thead><tbody>'+
+      wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>Productos</th><th>Días</th><th>Vencimiento</th><th>Acción</th></tr></thead><tbody>'+
         prx.map(function(c){
-          return '<tr><td><strong>'+esc(c.usuario)+'</strong></td><td>'+esc(c.nombre_completo||'—')+'</td><td>'+diasPill(c.dias_restantes)+'</td><td>'+fmtD(c.fecha_vencimiento)+'</td>'+
-            '<td><button class="btn btn-success btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')">Renovar</button></td></tr>';
+          return '<tr><td><strong>'+esc(c.usuario)+'</strong></td><td>'+esc(c.nombre_completo||'—')+'</td><td>'+productosBadges(c)+'</td><td>'+diasPill(c.dias_restantes)+'</td><td>'+fmtD(c.fecha_vencimiento)+'</td>'+
+            '<td><button class="btn btn-success btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\',\''+esc(c.producto||'chatgpt')+'\')">Renovar</button></td></tr>';
         }).join('')+'</tbody></table></div>';
     }
   }catch(e){}
 }
 
 /* ── CLIENTES ── */
-var ALL_CLI=[];
-
 async function loadClientes(){
   $('cli-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr>';
   try{
@@ -932,10 +916,13 @@ async function loadClientes(){
 function renderCli(){
   var q=$('q-cli').value.toLowerCase();
   var ef=$('f-est-cli').value;
+  var pf=$('f-prod-cli').value;
   var f=ALL_CLI.filter(function(c){
     var mq=!q||(c.usuario||'').toLowerCase().includes(q)||(c.nombre_completo||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q);
     var me=!ef||(c.estado_cliente||'')===ef;
-    return mq&&me;
+    var prods = c.productos || (c.producto ? [c.producto] : ['chatgpt']);
+    var mp=!pf || prods.indexOf(pf) !== -1;
+    return mq&&me&&mp;
   });
   if(!f.length){ $('cli-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><p>Sin resultados</p></div></td></tr>'; return; }
 
@@ -952,21 +939,24 @@ function renderCli(){
       '<td><strong>'+esc(c.usuario)+'</strong></td>'+
       '<td>'+esc(c.nombre_completo||'—')+'</td>'+
       '<td>'+badge(c.estado_cliente)+'</td>'+
-      '<td>'+badge(c.estado_suscripcion)+' <span class="chip" style="margin-left:4px;">'+esc(c.producto||'chatgpt')+'</span></td>'+
+      '<td>'+productosBadges(c)+'</td>'+
       '<td>'+fmtD(c.fecha_vencimiento)+'</td>'+
       '<td>'+diasPill(c.dias_restantes)+'</td>'+
       '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.cuenta_maestra_email||'—')+'</span></td>'+
       '<td><div class="action-row">'+
-        '<button class="btn btn-info btn-icon btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\')" title="Renovar">'+
+        '<button class="btn btn-info btn-icon btn-sm" onclick="abrirEditarCliente('+c.id+')" title="Editar cliente">'+
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
+        '</button>'+
+        '<button class="btn btn-info btn-icon btn-sm" onclick="abrirRenovar('+c.id+',\''+esc(c.usuario)+'\',\''+esc(c.producto||'chatgpt')+'\')" title="Renovar">'+
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>'+
         '</button>'+
-        (canMig?'<button class="btn btn-migrate btn-icon btn-sm" onclick="abrirMigrar('+c.id+',\''+esc(c.usuario)+'\')" title="Migrar a otra cuenta">'+
+        (canMig?'<button class="btn btn-migrate btn-icon btn-sm" onclick="abrirMigrar('+c.id+',\''+esc(c.usuario)+'\',\''+esc(c.producto||'chatgpt')+'\')" title="Migrar a otra cuenta">'+
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4M7 4l-4 4M7 4l4 4"/><path d="M17 8v12M17 20l4-4M17 20l-4-4"/></svg>'+
         '</button>':'')+
         (canSus?'<button class="btn btn-warning btn-icon btn-sm" onclick="abrirSuspender('+c.id+',\''+esc(c.usuario)+'\')" title="Suspender">'+
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'+
         '</button>':'')+
-        (canRev?'<button class="btn btn-danger btn-icon btn-sm" onclick="abrirRevocar('+c.id+',\''+esc(c.usuario)+'\')" title="Revocar acceso">'+
+        (canRev?'<button class="btn btn-danger btn-icon btn-sm" onclick="abrirRevocar('+c.id+',\''+esc(c.usuario)+'\',\''+esc(c.producto||'chatgpt')+'\')" title="Revocar acceso">'+
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'+
         '</button>':'')+
         (canRea?'<button class="btn btn-success btn-icon btn-sm" onclick="doReactivar('+c.id+',\''+esc(c.usuario)+'\')" title="Reactivar">'+
@@ -984,6 +974,7 @@ function renderCli(){
 
 $('q-cli').addEventListener('input',renderCli);
 $('f-est-cli').addEventListener('change',renderCli);
+$('f-prod-cli').addEventListener('change',renderCli);
 
 /* ── SELECCIÓN MÚLTIPLE ── */
 function toggleSeleccion(id, checkbox){
@@ -992,24 +983,18 @@ function toggleSeleccion(id, checkbox){
   var row=document.querySelector('tr[data-cliente-id="'+id+'"]');
   if(row) row.classList.toggle('selected', checkbox.checked);
   actualizarBulkToolbar();
-  var q=$('q-cli').value.toLowerCase();
-  var ef=$('f-est-cli').value;
-  var visibles=ALL_CLI.filter(function(c){
-    var mq=!q||(c.usuario||'').toLowerCase().includes(q)||(c.nombre_completo||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q);
-    var me=!ef||(c.estado_cliente||'')===ef;
-    return mq&&me;
-  }).map(function(c){return c.id;});
-  var todos = visibles.length>0 && visibles.every(function(id){return SELECCIONADOS.has(id);});
-  $('selectAllCli').checked = todos;
 }
 
 function toggleSelectAll(checkbox){
   var q=$('q-cli').value.toLowerCase();
   var ef=$('f-est-cli').value;
+  var pf=$('f-prod-cli').value;
   var visibles=ALL_CLI.filter(function(c){
     var mq=!q||(c.usuario||'').toLowerCase().includes(q)||(c.nombre_completo||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q);
     var me=!ef||(c.estado_cliente||'')===ef;
-    return mq&&me;
+    var prods = c.productos || (c.producto ? [c.producto] : ['chatgpt']);
+    var mp=!pf || prods.indexOf(pf) !== -1;
+    return mq&&me&&mp;
   });
   if(checkbox.checked){
     visibles.forEach(function(c){ SELECCIONADOS.add(c.id); });
@@ -1038,36 +1023,118 @@ function actualizarBulkToolbar(){
   }
 }
 
-/* ── CREAR CLIENTE ── */
+/* ── NUEVO CLIENTE ── */
+function abrirNuevoCliente(){
+  $('nc-u').value=''; $('nc-p').value=''; $('nc-n').value=''; $('nc-e').value=''; $('nc-d').value='30';
+  $('nc-prod-gpt').checked = true;
+  $('nc-prod-gemini').checked = false;
+  togglePill($('nc-prod-gpt'), 'nc-pill-gpt');
+  togglePill($('nc-prod-gemini'), 'nc-pill-gemini');
+  hideA('nc-alert');
+  openModal('m-new-c');
+}
+
 async function crearCliente(){
   var u=$('nc-u').value.trim(), p=$('nc-p').value.trim(), n=$('nc-n').value.trim(), e=$('nc-e').value.trim(), d=parseInt($('nc-d').value)||30;
+  var productos = [];
+  if ($('nc-prod-gpt').checked) productos.push('chatgpt');
+  if ($('nc-prod-gemini').checked) productos.push('gemini');
+
   if(!u||!p){showA('nc-alert','Usuario y contraseña son obligatorios.');return;}
+  if(!productos.length){showA('nc-alert','Selecciona al menos un producto.');return;}
+
   var btn=$('nc-btn'); btn.disabled=true; btn.textContent='Creando...'; hideA('nc-alert');
   try{
-    await api('crear_cliente','POST',{usuario:u,password:p,email:e,nombre_completo:n,dias:d});
+    await api('crear_cliente','POST',{
+      usuario:u, password:p, email:e, nombre_completo:n, dias:d, productos:productos
+    });
     closeModal('m-new-c');
-    toast('Cliente "'+u+'" creado con '+d+' días');
-    $('nc-u').value=''; $('nc-p').value=''; $('nc-n').value=''; $('nc-e').value=''; $('nc-d').value='30';
+    toast('Cliente "'+u+'" creado con: '+productos.join(', '));
     loadClientes(); loadDashboard();
-  }catch(e){showA('nc-alert',e.message);}
+  }catch(err){showA('nc-alert',err.message);}
   finally{btn.disabled=false; btn.textContent='Crear cliente';}
 }
 
+/* ── EDITAR CLIENTE ── */
+function abrirEditarCliente(id){
+  var c = ALL_CLI.find(function(x){return x.id === id;});
+  if (!c) { toast('Cliente no encontrado','error'); return; }
+
+  PENDING_EDIT = { id: id, cliente: c };
+
+  $('ec-info').innerHTML = 'Editando a <strong style="color:#fff;">'+esc(c.usuario)+'</strong> (ID: '+id+')';
+  $('ec-n').value = c.nombre_completo || '';
+  $('ec-e').value = c.email || '';
+  $('ec-p').value = '';
+
+  // Marcar productos actuales
+  var prods = c.productos || (c.producto ? [c.producto] : []);
+  var tieneGpt = prods.indexOf('chatgpt') !== -1;
+  var tieneGemini = prods.indexOf('gemini') !== -1;
+
+  $('ec-prod-gpt').checked = tieneGpt;
+  $('ec-prod-gemini').checked = tieneGemini;
+  togglePill($('ec-prod-gpt'), 'ec-pill-gpt');
+  togglePill($('ec-prod-gemini'), 'ec-pill-gemini');
+
+  hideA('ec-alert');
+  openModal('m-edit-c');
+}
+
+async function doEditarCliente(){
+  if (!PENDING_EDIT) return;
+
+  var nuevoNombre = $('ec-n').value.trim();
+  var nuevoEmail = $('ec-e').value.trim();
+  var nuevoPassword = $('ec-p').value.trim();
+  var productos = [];
+  if ($('ec-prod-gpt').checked) productos.push('chatgpt');
+  if ($('ec-prod-gemini').checked) productos.push('gemini');
+  var dias = parseInt($('ec-d').value) || 30;
+
+  if (!productos.length) {
+    showA('ec-alert','El cliente debe tener al menos un producto.');
+    return;
+  }
+
+  var btn=$('ec-btn'); btn.disabled=true; btn.textContent='Guardando...'; hideA('ec-alert');
+
+  try {
+    await api('editar_cliente','POST',{
+      cliente_id: PENDING_EDIT.id,
+      nombre_completo: nuevoNombre,
+      email: nuevoEmail,
+      password: nuevoPassword || null,
+      productos: productos,
+      dias_nuevas_suscripciones: dias
+    });
+    closeModal('m-edit-c');
+    toast('Cliente actualizado correctamente');
+    loadClientes(); loadDashboard();
+  } catch(err) {
+    showA('ec-alert', err.message);
+  } finally {
+    btn.disabled=false; btn.textContent='Guardar cambios';
+  }
+}
+
 /* ── RENOVAR ── */
-function abrirRenovar(id,usuario){
-  PENDING={id:id,usuario:usuario};
+function abrirRenovar(id, usuario, producto){
+  PENDING = { id: id, usuario: usuario };
   $('ren-info').innerHTML='<strong>'+esc(usuario)+'</strong> &nbsp;<span class="chip">#'+id+'</span>';
+  if (producto) $('ren-prod').value = producto;
   hideA('ren-alert'); openModal('m-ren');
 }
 async function doRenovar(){
   if(!PENDING)return;
   var d=parseInt($('ren-d').value)||30, m=parseFloat($('ren-m').value)||0;
   var met=$('ren-met').value, ref=$('ren-ref').value.trim();
+  var prod=$('ren-prod').value;
   var btn=$('ren-btn'); btn.disabled=true; btn.textContent='Renovando...'; hideA('ren-alert');
   try{
-    await api('renovar','POST',{cliente_id:PENDING.id,dias:d,monto:m,metodo:met,referencia:ref||null});
+    await api('renovar','POST',{cliente_id:PENDING.id,dias:d,monto:m,metodo:met,referencia:ref||null,producto:prod});
     closeModal('m-ren');
-    toast('Suscripción de "'+PENDING.usuario+'" renovada por '+d+' días');
+    toast('Suscripción de "'+PENDING.usuario+'" ('+prod+') renovada por '+d+' días');
     loadClientes(); loadDashboard();
   }catch(e){showA('ren-alert',e.message);}
   finally{btn.disabled=false; btn.textContent='Renovar';}
@@ -1092,18 +1159,20 @@ async function doSuspender(){
 }
 
 /* ── REVOCAR ── */
-function abrirRevocar(id,usuario){
+function abrirRevocar(id,usuario,producto){
   PENDING_REV={id:id,usuario:usuario};
   $('rev-info').innerHTML='¿Forzar el cierre de sesión de <strong>'+esc(usuario)+'</strong> (ID: '+id+')?';
+  if (producto) $('rev-prod').value = producto;
   openModal('m-rev');
 }
 async function doRevocar(){
   if(!PENDING_REV)return;
+  var prod = $('rev-prod').value;
   var btn=$('rev-btn'); btn.disabled=true; btn.textContent='Revocando...';
   try{
-    await api('revocar_acceso','POST',{cliente_id:PENDING_REV.id});
+    await api('revocar_acceso','POST',{cliente_id:PENDING_REV.id, producto:prod});
     closeModal('m-rev');
-    toast('Acceso de "'+PENDING_REV.usuario+'" revocado. Se cerrará en ≤15 min.','info');
+    toast('Acceso de "'+PENDING_REV.usuario+'" ('+prod+') revocado. Se cerrará en ≤15 min.','info');
     loadClientes(); loadDashboard();
   }catch(e){toast('Error al revocar: '+e.message,'error');}
   finally{btn.disabled=false; btn.textContent='Revocar ahora';}
@@ -1111,12 +1180,12 @@ async function doRevocar(){
 
 async function revocarSeleccionados(){
   if(SELECCIONADOS.size===0) return;
-  if(!confirm('¿Revocar el acceso de '+SELECCIONADOS.size+' cliente(s)?')) return;
+  if(!confirm('¿Revocar el acceso de '+SELECCIONADOS.size+' cliente(s)?\n\nSe revocará en TODOS sus productos.')) return;
   var ids=Array.from(SELECCIONADOS);
   var ok=0, fail=0;
   for(var i=0;i<ids.length;i++){
     try{
-      await api('revocar_acceso','POST',{cliente_id:ids[i]});
+      await api('revocar_acceso','POST',{cliente_id:ids[i], producto:null});
       ok++;
     }catch(e){ fail++; }
   }
@@ -1125,18 +1194,38 @@ async function revocarSeleccionados(){
   loadClientes(); loadDashboard();
 }
 
-/* ── MIGRAR INDIVIDUAL ── */
-async function abrirMigrar(id,usuario){
-  PENDING_MIG={id:id,usuario:usuario,scope:'single'};
+/* ── MIGRAR ── */
+async function abrirMigrar(id,usuario,producto){
+  PENDING_MIG={id:id,usuario:usuario};
   $('mig-info').innerHTML='Mover a <strong>'+esc(usuario)+'</strong> (ID: '+id+') a otra cuenta maestra.';
+  if (producto) $('mig-prod').value = producto;
   hideA('mig-alert');
-  await cargarCuentasEnSelect('mig-cuenta');
+  await cargarCuentasMigrar();
   openModal('m-mig');
+}
+
+async function cargarCuentasMigrar(){
+  var prod = $('mig-prod').value;
+  try {
+    var r = await api('listar_cuentas&producto='+prod);
+    var cuentas = (r.cuentas||[]).filter(function(c){ return c.estado==='activa'; });
+    var sel = $('mig-cuenta');
+    if(!cuentas.length){
+      sel.innerHTML='<option value="">No hay cuentas activas de '+prod+'</option>';
+    }else{
+      sel.innerHTML=cuentas.map(function(c){
+        return '<option value="'+c.id+'">'+esc(c.email)+' (#'+c.id+')</option>';
+      }).join('');
+    }
+  } catch(e) {
+    $('mig-cuenta').innerHTML='<option value="">Error cargando cuentas</option>';
+  }
 }
 
 async function doMigrar(){
   if(!PENDING_MIG)return;
   var nuevaId=parseInt($('mig-cuenta').value);
+  var prod = $('mig-prod').value;
   if(!nuevaId){ showA('mig-alert','Selecciona una cuenta maestra.'); return; }
 
   var btn=$('mig-btn');
@@ -1147,10 +1236,11 @@ async function doMigrar(){
   try{
     await api('migrar_cuenta','POST',{
       cliente_id:PENDING_MIG.id,
-      nueva_cuenta_id:nuevaId
+      nueva_cuenta_id:nuevaId,
+      producto:prod
     });
     closeModal('m-mig');
-    toast('Migración de "'+PENDING_MIG.usuario+'" iniciada. Se aplicará en ≤15 min.','info');
+    toast('Migración de "'+PENDING_MIG.usuario+'" ('+prod+') iniciada. Se aplicará en ≤15 min.','info');
     loadClientes();
     loadDashboard();
   }catch(e){
@@ -1161,182 +1251,12 @@ async function doMigrar(){
   }
 }
 
-async function abrirMigrarSeleccionados(){
-  if(SELECCIONADOS.size===0) return;
-  PENDING_MIG_BATCH={ids:Array.from(SELECCIONADOS),scope:'seleccion'};
-  await abrirModalMigracionBatch('seleccion');
-}
-
-async function abrirMigrarTodos(){
-  var elegibles=ALL_CLI.filter(function(c){
-    var e=(c.estado_cliente||'').toLowerCase();
-    return e==='activo'||e==='vencido';
-  });
-  if(!elegibles.length){
-    toast('No hay clientes elegibles para migrar.','warning');
-    return;
-  }
-  PENDING_MIG_BATCH={ids:elegibles.map(function(c){return c.id;}),scope:'todos'};
-  await abrirModalMigracionBatch('todos');
-}
-
-async function abrirModalMigracionBatch(scope){
-  if(!PENDING_MIG_BATCH || !PENDING_MIG_BATCH.ids.length) return;
-
-  var n=PENDING_MIG_BATCH.ids.length;
-  var label = scope==='todos' ? 'TODOS los clientes activos/vencidos' : 'los '+n+' clientes seleccionados';
-  $('migb-info').innerHTML='Migrar <strong>'+label+'</strong> ('+n+' en total) a la cuenta seleccionada.';
-
-  await cargarCuentasEnSelect('migb-cuenta');
-
-  $('migb-total').textContent = n;
-  $('migb-intervalo').value = 20;
-  actualizarPreviewBatch();
-
-  $('migb-intervalo').oninput = actualizarPreviewBatch;
-
-  hideA('migb-alert');
-  openModal('m-mig-batch');
-}
-
-function actualizarPreviewBatch(){
-  var n = PENDING_MIG_BATCH ? PENDING_MIG_BATCH.ids.length : 0;
-  var min = parseInt($('migb-intervalo').value) || 20;
-  var tiempoTotal = (n-1) * min;
-  $('migb-intervalo-txt').textContent = min + ' min';
-  var h = Math.floor(tiempoTotal / 60);
-  var m = tiempoTotal % 60;
-  var txt = '';
-  if(h > 0) txt += h + ' h ';
-  txt += m + ' min';
-  $('migb-tiempo').textContent = txt;
-}
-
-async function cargarCuentasEnSelect(selectId){
-  try{
-    var r=await api('listar_cuentas');
-    var cuentas=(r.cuentas||[]).filter(function(c){ return c.estado==='activa'; });
-    var sel=$(selectId);
-    if(!cuentas.length){
-      sel.innerHTML='<option value="">No hay cuentas activas</option>';
-    }else{
-      sel.innerHTML=cuentas.map(function(c){
-        return '<option value="'+c.id+'">'+esc(c.email)+' (#'+c.id+')</option>';
-      }).join('');
-    }
-  }catch(e){
-    var sel=$(selectId);
-    if(sel) sel.innerHTML='<option value="">Error cargando cuentas</option>';
-  }
-}
-
-async function doMigrarBatch(){
-  if(!PENDING_MIG_BATCH || !PENDING_MIG_BATCH.ids.length) return;
-
-  var nuevaId = parseInt($('migb-cuenta').value);
-  var intervalo = parseInt($('migb-intervalo').value) || 20;
-
-  if(!nuevaId){ showA('migb-alert','Selecciona una cuenta maestra.'); return; }
-  if(intervalo < 5){ showA('migb-alert','El intervalo mínimo es 5 minutos.'); return; }
-
-  var btn=$('migb-btn');
-  btn.disabled=true;
-  btn.innerHTML='<div class="spinner"></div>&nbsp;Creando batch...';
-  hideA('migb-alert');
-
-  try{
-    var r = await api('crear_batch_migracion','POST',{
-      cliente_ids: PENDING_MIG_BATCH.ids,
-      nueva_cuenta_id: nuevaId,
-      intervalo_minutos: intervalo
-    });
-
-    closeModal('m-mig-batch');
-    limpiarSeleccion();
-
-    toast('Migración masiva iniciada: '+r.total_items+' clientes. Se completará en '+(r.tiempo_estimado_min||0)+' min.','info');
-
-    BATCH_ACTIVO = { id: r.batch_id, total: r.total_items };
-    actualizarBannerBatch({ procesados: 0, total_items: r.total_items, proximo_en: intervalo*60, estado: 'en_progreso' });
-    $('migrationBanner').classList.add('visible');
-
-    if(INTERVALO_BATCH_POLL) clearInterval(INTERVALO_BATCH_POLL);
-    INTERVALO_BATCH_POLL = setInterval(verificarBatchActivo, 20000);
-
-    loadClientes();
-    loadDashboard();
-  }catch(e){
-    showA('migb-alert', e.message);
-  }finally{
-    btn.disabled=false;
-    btn.textContent='Iniciar migración masiva';
-  }
-}
-
-/* ── BATCH ── */
-async function verificarBatchActivo(){
-  if(!API || !TOK) return;
-  try{
-    var r = await api('estado_batch_migracion');
-    var batch = r.batch;
-
-    if(!batch || batch.estado === 'completado' || batch.estado === 'cancelado'){
-      BATCH_ACTIVO = null;
-      $('migrationBanner').classList.remove('visible');
-      if(INTERVALO_BATCH_POLL && batch && batch.estado === 'completado'){
-        clearInterval(INTERVALO_BATCH_POLL);
-        toast('Migración masiva completada: '+batch.procesados+'/'+batch.total_items,'success');
-        INTERVALO_BATCH_POLL=null;
-      }
-      return;
-    }
-
-    BATCH_ACTIVO = { id: batch.id, total: batch.total_items };
-    actualizarBannerBatch(batch);
-    $('migrationBanner').classList.add('visible');
-  }catch(e){}
-}
-
-function actualizarBannerBatch(batch){
-  var procesados = batch.procesados || 0;
-  var total = batch.total_items || batch.total || 0;
-  var pct = total > 0 ? Math.round((procesados / total) * 100) : 0;
-
-  $('migBannerTitle').textContent = 'Migración masiva en progreso';
-  $('migBannerSub').textContent = procesados + ' de ' + total + ' clientes migrados · ' + pct + '%' + (batch.proximo_en ? ' · Próximo en ' + formatearTiempo(batch.proximo_en) : '');
-  $('migBannerBar').style.width = pct + '%';
-}
-
-function formatearTiempo(segundos){
-  if(!segundos || segundos < 0) return '—';
-  var h = Math.floor(segundos / 3600);
-  var m = Math.floor((segundos % 3600) / 60);
-  var s = segundos % 60;
-  if(h > 0) return h + 'h ' + m + 'm';
-  if(m > 0) return m + 'm ' + s + 's';
-  return s + 's';
-}
-
-async function cancelarBatchActivo(){
-  if(!BATCH_ACTIVO) return;
-  if(!confirm('¿Cancelar la migración masiva en progreso? Los clientes ya migrados permanecerán migrados.')) return;
-  try{
-    await api('cancelar_batch_migracion','POST',{ batch_id: BATCH_ACTIVO.id });
-    toast('Migración masiva cancelada','warning');
-    BATCH_ACTIVO = null;
-    $('migrationBanner').classList.remove('visible');
-    if(INTERVALO_BATCH_POLL){ clearInterval(INTERVALO_BATCH_POLL); INTERVALO_BATCH_POLL=null; }
-  }catch(e){
-    toast('Error: '+e.message,'error');
-  }
-}
-
 /* ── REVOCAR TODOS ── */
 async function revocarTodos(){
-  var txt=prompt('Esto cerrará la sesión de TODOS los clientes.\n\nEscribe REVOCAR para confirmar:');
+  var txt=prompt('Esto cerrará la sesión de TODOS los clientes en TODOS sus productos.\n\nEscribe REVOCAR para confirmar:');
   if(txt!=='REVOCAR'){ toast('Cancelado.','info'); return; }
   try{
-    var r=await api('revocar_todos','POST',{});
+    var r=await api('revocar_todos','POST',{producto:null});
     toast('Revocación masiva enviada a '+(r.afectados||0)+' clientes','warning');
   }catch(e){
     toast('Error: '+e.message,'error');
@@ -1355,21 +1275,23 @@ async function doReactivar(id,usuario){
 
 /* ── CUENTAS MAESTRAS ── */
 async function loadCuentas(){
-  $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr>';
+  $('cm-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon"><div class="spinner"></div></div><p>Cargando...</p></div></td></tr>';
   try{
-    var r=await api('listar_cuentas');
+    var prod = $('f-prod-cm').value;
+    var url = 'listar_cuentas' + (prod ? '&producto='+prod : '');
+    var r=await api(url);
     var cuentas=r.cuentas||[];
-    if(!cuentas.length){ $('cm-tb').innerHTML='<tr><td colspan="10"><div class="empty-state"><p>No hay cuentas maestras</p></div></td></tr>'; return; }
+    if(!cuentas.length){ $('cm-tb').innerHTML='<tr><td colspan="8"><div class="empty-state"><p>No hay cuentas maestras</p></div></td></tr>'; return; }
     $('cm-tb').innerHTML=cuentas.map(function(c){
+      var prodLabel = c.producto === 'gemini' ? 'Gemini Flow' : (c.producto === 'chatgpt' ? 'ChatGPT' : c.producto);
+      var prodClass = c.producto === 'gemini' ? 'gemini' : 'gpt';
       return '<tr>'+
         '<td><span class="chip">#'+c.id+'</span></td>'+
-        '<td><span class="chip">'+esc(c.producto||'chatgpt')+'</span></td>'+
+        '<td><span class="product-badge '+prodClass+'">'+prodLabel+'</span></td>'+
         '<td>'+esc(c.email)+'</td>'+
         '<td>'+badge(c.estado)+'</td>'+
         '<td>'+(c.totp_seed?'<span style="color:var(--accent);">'+ICON.check+'</span>':'<span style="color:var(--text-dim);">—</span>')+'</td>'+
         '<td>'+fmtD(c.fecha_alta)+'</td>'+
-        '<td>'+fmtDT(c.ultima_verificacion)+'</td>'+
-        '<td>'+(c.verificacion_ok===false?'<span style="color:var(--danger);">'+ICON.x+'</span>':'<span style="color:var(--accent);">'+ICON.check+'</span>')+'</td>'+
         '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(c.notas||'—')+'</span></td>'+
         '<td><div class="action-row">'+
           (c.estado==='activa'
@@ -1381,10 +1303,18 @@ async function loadCuentas(){
   }catch(e){ toast('Error cuentas: '+e.message,'error'); }
 }
 
-function estadoCuenta(id,nuevoEstado){
+$('f-prod-cm').addEventListener('change', loadCuentas);
+
+async function estadoCuenta(id, nuevoEstado){
   var acc=nuevoEstado==='baneada'?'banear':'activar';
-  if(!confirm('¿Deseas '+acc+' esta cuenta maestra?'))return;
-  toast('Requiere agregar acción "cambiar_estado_cuenta" a la Edge Function admin.','info');
+  if(!confirm('¿Deseas '+acc+' esta cuenta maestra?')) return;
+  try {
+    await api('cambiar_estado_cuenta','POST',{ cuenta_id: id, nuevo_estado: nuevoEstado });
+    toast('Cuenta '+acc+'da correctamente');
+    loadCuentas(); loadDashboard();
+  } catch(e) {
+    toast('Error: '+e.message,'error');
+  }
 }
 
 async function crearCuenta(){
@@ -1397,7 +1327,7 @@ async function crearCuenta(){
     toast('Cuenta maestra "'+e+'" creada');
     $('cm-e').value=''; $('cm-p').value=''; $('cm-t').value=''; $('cm-n').value='';
     loadCuentas(); loadDashboard();
-  }catch(e){showA('cm-alert',e.message);}
+  }catch(err){showA('cm-alert',err.message);}
   finally{btn.disabled=false; btn.textContent='Crear cuenta';}
 }
 
@@ -1432,7 +1362,7 @@ async function loadLogs(){
     ALL_LOG=r.logs||[];
     renderLogs();
   }catch(e){
-    $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><p style="color:var(--text-muted);">Agrega la acción <code>listar_logs</code> a la Edge Function admin.</p></div></td></tr>';
+    $('log-tb').innerHTML='<tr><td colspan="6"><div class="empty-state"><p>Error cargando logs</p></div></td></tr>';
   }
 }
 function renderLogs(){
@@ -1450,13 +1380,66 @@ function renderLogs(){
       '<td>'+(l.cliente_id?'<span class="chip">#'+l.cliente_id+'</span>':'—')+'</td>'+
       '<td>'+esc(l.accion||'—')+'</td>'+
       '<td><span style="color:'+(cols[l.resultado]||'var(--text-muted)')+';font-weight:600;">'+esc(l.resultado||'—')+'</span></td>'+
-      '<td><span style="font-family:monospace;font-size:11px;">'+esc(l.ip||'—')+'</span></td>'+
+      '<td><span style="font-size:11px;color:var(--text-muted);">'+esc(l.user_agent||'—')+'</span></td>'+
       '<td>'+fmtDT(l.fecha)+'</td>'+
     '</tr>';
   }).join('');
 }
 $('q-log').addEventListener('input',renderLogs);
 $('f-res').addEventListener('change',renderLogs);
+
+/* ── BATCH ── */
+async function verificarBatchActivo(){
+  if(!API || !TOK) return;
+  try{
+    var r = await api('estado_batch_migracion');
+    var batch = r.batch;
+    if(!batch || batch.estado === 'completado' || batch.estado === 'cancelado'){
+      BATCH_ACTIVO = null;
+      $('migrationBanner').classList.remove('visible');
+      if(INTERVALO_BATCH_POLL && batch && batch.estado === 'completado'){
+        clearInterval(INTERVALO_BATCH_POLL);
+        toast('Migración masiva completada: '+batch.procesados+'/'+batch.total_items,'success');
+        INTERVALO_BATCH_POLL=null;
+      }
+      return;
+    }
+    BATCH_ACTIVO = { id: batch.id, total: batch.total_items };
+    actualizarBannerBatch(batch);
+    $('migrationBanner').classList.add('visible');
+  }catch(e){}
+}
+
+function actualizarBannerBatch(batch){
+  var procesados = batch.procesados || 0;
+  var total = batch.total_items || 0;
+  var pct = total > 0 ? Math.round((procesados / total) * 100) : 0;
+  $('migBannerTitle').textContent = 'Migración masiva en progreso';
+  $('migBannerSub').textContent = procesados + ' de ' + total + ' clientes · ' + pct + '%' + (batch.proximo_en ? ' · Próximo en ' + formatearTiempo(batch.proximo_en) : '');
+  $('migBannerBar').style.width = pct + '%';
+}
+
+function formatearTiempo(segundos){
+  if(!segundos || segundos < 0) return '—';
+  var h = Math.floor(segundos / 3600);
+  var m = Math.floor((segundos % 3600) / 60);
+  var s = segundos % 60;
+  if(h > 0) return h + 'h ' + m + 'm';
+  if(m > 0) return m + 'm ' + s + 's';
+  return s + 's';
+}
+
+async function cancelarBatchActivo(){
+  if(!BATCH_ACTIVO) return;
+  if(!confirm('¿Cancelar la migración masiva?')) return;
+  try{
+    await api('cancelar_batch_migracion','POST',{ batch_id: BATCH_ACTIVO.id });
+    toast('Migración masiva cancelada','warning');
+    BATCH_ACTIVO = null;
+    $('migrationBanner').classList.remove('visible');
+    if(INTERVALO_BATCH_POLL){ clearInterval(INTERVALO_BATCH_POLL); INTERVALO_BATCH_POLL=null; }
+  }catch(e){ toast('Error: '+e.message,'error'); }
+}
 </script>
 </body>
 </html>
