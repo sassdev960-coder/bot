@@ -119,22 +119,16 @@
     /* CHECKBOX */
     .checkbox-wrap { display: flex; align-items: center; justify-content: center; }
     .checkbox {
-      appearance: none;
-      -webkit-appearance: none;
+      appearance: none; -webkit-appearance: none;
       width: 16px; height: 16px;
       border: 1.5px solid var(--border-hover);
       border-radius: 4px;
-      cursor: pointer;
-      position: relative;
+      cursor: pointer; position: relative;
       transition: all 0.15s;
-      background: transparent;
-      flex-shrink: 0;
+      background: transparent; flex-shrink: 0;
     }
     .checkbox:hover { border-color: var(--info); }
-    .checkbox:checked {
-      background: var(--info);
-      border-color: var(--info);
-    }
+    .checkbox:checked { background: var(--info); border-color: var(--info); }
     .checkbox:checked::after {
       content: '';
       position: absolute;
@@ -668,7 +662,7 @@
   </div>
 </div>
 
-<!-- Migrar a cuenta (individual o seleccionados) -->
+<!-- Migrar individual o seleccionados -->
 <div class="modal-overlay hidden" id="m-mig">
   <div class="modal">
     <div class="modal-header">
@@ -697,7 +691,7 @@
   </div>
 </div>
 
-<!-- Migrar masiva (todos o seleccionados) -->
+<!-- Migrar masiva -->
 <div class="modal-overlay hidden" id="m-mig-batch">
   <div class="modal">
     <div class="modal-header">
@@ -823,7 +817,7 @@ function hideA(id){ var el=$(id); if(el){el.className='alert-box';el.textContent
 
 async function api(accion,method,body){
   method=method||'GET';
-  var opts={method:method,headers:{'Authorization':'Bearer '+TOK,'Content-Type':'application/json'}};
+  var opts={method:method,headers:{'Authorization':TOK,'Content-Type':'application/json'}};
   if(body)opts.body=JSON.stringify(body);
   var res=await fetch(API+'/admin?accion='+accion,opts);
   var data=await res.json();
@@ -982,7 +976,6 @@ function renderCli(){
     '</tr>';
   }).join('');
 
-  // Actualizar select all
   var visibles=f.map(function(c){return c.id;});
   var todosSeleccionados = visibles.length>0 && visibles.every(function(id){return SELECCIONADOS.has(id);});
   var selAll = $('selectAllCli');
@@ -999,7 +992,6 @@ function toggleSeleccion(id, checkbox){
   var row=document.querySelector('tr[data-cliente-id="'+id+'"]');
   if(row) row.classList.toggle('selected', checkbox.checked);
   actualizarBulkToolbar();
-  // Actualizar select all
   var q=$('q-cli').value.toLowerCase();
   var ef=$('f-est-cli').value;
   var visibles=ALL_CLI.filter(function(c){
@@ -1176,7 +1168,6 @@ async function abrirMigrarSeleccionados(){
 }
 
 async function abrirMigrarTodos(){
-  // Filtrar clientes activos o vencidos (no suspendidos ni cancelados)
   var elegibles=ALL_CLI.filter(function(c){
     var e=(c.estado_cliente||'').toLowerCase();
     return e==='activo'||e==='vencido';
@@ -1265,12 +1256,10 @@ async function doMigrarBatch(){
 
     toast('Migración masiva iniciada: '+r.total_items+' clientes. Se completará en '+(r.tiempo_estimado_min||0)+' min.','info');
 
-    // Activar banner
     BATCH_ACTIVO = { id: r.batch_id, total: r.total_items };
-    actualizarBannerBatch({ procesados: 0, total: r.total_items, proximo_en: intervalo*60, estado: 'en_progreso' });
+    actualizarBannerBatch({ procesados: 0, total_items: r.total_items, proximo_en: intervalo*60, estado: 'en_progreso' });
     $('migrationBanner').classList.add('visible');
 
-    // Refrescar cada 20s hasta que termine
     if(INTERVALO_BATCH_POLL) clearInterval(INTERVALO_BATCH_POLL);
     INTERVALO_BATCH_POLL = setInterval(verificarBatchActivo, 20000);
 
@@ -1284,7 +1273,7 @@ async function doMigrarBatch(){
   }
 }
 
-/* ── BATCH DE MIGRACIÓN ── */
+/* ── BATCH ── */
 async function verificarBatchActivo(){
   if(!API || !TOK) return;
   try{
@@ -1305,9 +1294,7 @@ async function verificarBatchActivo(){
     BATCH_ACTIVO = { id: batch.id, total: batch.total_items };
     actualizarBannerBatch(batch);
     $('migrationBanner').classList.add('visible');
-  }catch(e){
-    // silent
-  }
+  }catch(e){}
 }
 
 function actualizarBannerBatch(batch){
