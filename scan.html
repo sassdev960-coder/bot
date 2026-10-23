@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <title>Marcar Asistencia</title>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+      color: #111827;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hidden { display: none !important; }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    /* ============================================================
+       LOGIN - PIN PAD
+       ============================================================ */
+    #screen-login {
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.25rem;
+    }
+    .login-box {
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+    .login-box h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: .4rem;
+    }
+    .login-box .subtitle {
+      color: #94a3b8;
+      font-size: .9rem;
+      margin-bottom: 2rem;
+      line-height: 1.4;
+    }
+    .pin-display {
+      background: rgba(255,255,255,.06);
+      border: 2px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 1.5rem 1rem;
+      margin-bottom: 1.5rem;
+      min-height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: .3em;
+      font-variant-numeric: tabular-nums;
+    }
+    .pin-display.empty {
+      color: #475569;
+      font-size: 1.05rem;
+      letter-spacing: 0;
+      font-weight: 500;
+      font-family: inherit;
+    }
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .65rem;
+    }
+    .pin-btn {
+      background: rgba(255,255,255,.08);
+      border: none;
+      border-radius: 14px;
+      padding: 1.15rem 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: background .12s, transform .08s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pin-btn:hover:not(:disabled) { background: rgba(255,255,255,.16); }
+    .pin-btn:active:not(:disabled) { transform: scale(.95); }
+    .pin-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .pin-btn.del { color: #f87171; }
+    .pin-btn.ok {
+      background: #2563eb;
+      color: #fff;
+    }
+    .pin-btn.ok:hover:not(:disabled) { background: #1e40af; }
+    .pin-btn.ok:disabled { background: rgba(37,99,235,.4); }
+
+    .login-error {
+      color: #fca5a5;
+      font-size: .9rem;
+      margin-top: 1rem;
+      min-height: 1.2rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* ============================================================
+       CAMERA
+       ============================================================ */
+    #screen-camera {
+      padding: 0;
+      background: #000;
+    }
+    .camera-header {
+      background: #111827;
+      padding: .9rem 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .camera-header .user {
+      color: #fff;
+      font-size: .9rem;
+      display: flex;
+      flex-direction: column;
+      gap: .1rem;
+    }
+    .camera-header .user strong { font-weight: 700; }
+    .camera-header .user small { color: #94a3b8; font-size: .75rem; }
+    .camera-header .logout-btn {
+      background: rgba(255,255,255,.1);
+      border: none;
+      color: #fff;
+      padding: .45rem .8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .78rem;
+      font-family: inherit;
+      font-weight: 500;
+    }
+    .camera-header .logout-btn:hover { background: rgba(255,255,255,.2); }
+
+    .reader-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    #reader {
+      position: absolute;
+      inset: 0;
+    }
+    #reader video {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+    #reader__scan_region { min-height: 100% !important; }
+    #reader__dashboard { display: none !important; }
+
+    .viewfinder {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 240px; height: 240px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .viewfinder::before,
+    .viewfinder::after {
+      content: '';
+      position: absolute;
+      width: 42px; height: 42px;
+      border: 4px solid #22c55e;
+      border-radius: 8px;
+    }
+    .viewfinder::before {
+      top: 0; left: 0;
+      border-right: none;
+      border-bottom: none;
+    }
+    .viewfinder::after {
+      bottom: 0; right: 0;
+      border-left: none;
+      border-top: none;
+    }
+
+    .camera-hint {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 1.25rem;
+      right: 1.25rem;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      padding: 1rem;
+      border-radius: 14px;
+      text-align: center;
+      font-size: .9rem;
+      line-height: 1.4;
+      z-index: 5;
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       RESULT
+       ============================================================ */
+    #screen-result {
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.25rem;
+    }
+    .result-box {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      animation: pop .25s ease-out;
+    }
+    @keyframes pop {
+      from { transform: scale(.9); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .result-icon {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin: 0 auto 1.5rem;
+    }
+    .result-icon.success {
+      background: #16a34a;
+      color: #fff;
+      box-shadow: 0 0 0 12px rgba(22,163,74,.2);
+    }
+    .result-icon.out {
+      background: #d97706;
+      color: #fff;
+      box-shadow: 0 0 0 12px rgba(217,119,6,.2);
+    }
+    .result-icon.error {
+      background: #dc2626;
+      color: #fff;
+      box-shadow: 0 0 0 12px rgba(220,38,38,.2);
+    }
+    .result-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: .5rem;
+    }
+    .result-name {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+    .result-time-box {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .result-time-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #94a3b8;
+      font-weight: 700;
+      margin-bottom: .35rem;
+    }
+    .result-time {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .result-date {
+      color: #94a3b8;
+      font-size: .85rem;
+      margin-top: .35rem;
+    }
+    .result-msg {
+      font-size: 1rem;
+      color: #fca5a5;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .result-btn {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+      transition: background .15s, transform .1s;
+    }
+    .result-btn:hover { background: #1e40af; }
+    .result-btn:active { transform: scale(.97); }
+    .result-btn.ghost {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,.2);
+      color: #fff;
+      margin-top: .65rem;
+    }
+
+    /* ============================================================
+       LOADING
+       ============================================================ */
+    #screen-loading {
+      justify-content: center;
+      align-items: center;
+    }
+    .spinner {
+      width: 50px; height: 50px;
+      border: 4px solid rgba(255,255,255,.1);
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #94a3b8; font-size: .92rem; }
+
+    @media (max-width: 380px) {
+      .pin-btn { padding: .95rem 0; font-size: 1.4rem; }
+      .pin-display { font-size: 2rem; padding: 1.25rem .75rem; }
+      .login-box h1 { font-size: 1.3rem; }
+      .result-time { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     PANTALLA 1: LOGIN CON PIN PAD
+     ============================================================ -->
+<div id="screen-login" class="screen">
+  <div class="login-box">
+    <h1>Marcar asistencia</h1>
+    <p class="subtitle">Ingresa tu codigo numerico asignado por el administrador</p>
+
+    <div class="pin-display empty" id="pin-display">Ingresa tu codigo</div>
+
+    <div class="pin-pad" id="pin-pad">
+      <button class="pin-btn" data-digit="1">1</button>
+      <button class="pin-btn" data-digit="2">2</button>
+      <button class="pin-btn" data-digit="3">3</button>
+      <button class="pin-btn" data-digit="4">4</button>
+      <button class="pin-btn" data-digit="5">5</button>
+      <button class="pin-btn" data-digit="6">6</button>
+      <button class="pin-btn" data-digit="7">7</button>
+      <button class="pin-btn" data-digit="8">8</button>
+      <button class="pin-btn" data-digit="9">9</button>
+      <button class="pin-btn del" data-action="del">&#9003;</button>
+      <button class="pin-btn" data-digit="0">0</button>
+      <button class="pin-btn ok" data-action="ok" id="pin-ok" disabled>&#10003;</button>
+    </div>
+
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANTALLA 2: CAMARA
+     ============================================================ -->
+<div id="screen-camera" class="screen hidden">
+  <div class="camera-header">
+    <div class="user">
+      <strong id="camera-name">Empleado</strong>
+      <small id="camera-position">Cargo</small>
+    </div>
+    <button class="logout-btn" id="btn-logout">Salir</button>
+  </div>
+  <div class="reader-wrap">
+    <div id="reader"></div>
+    <div class="viewfinder"></div>
+    <div class="camera-hint" id="camera-hint">
+      Apunta la camara al QR pegado en la entrada
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANTALLA 3: RESULTADO
+     ============================================================ -->
+<div id="screen-result" class="screen hidden">
+  <div class="result-box">
+    <div class="result-icon" id="result-icon">&#10003;</div>
+    <div class="result-title" id="result-title">Listo</div>
+    <div class="result-name" id="result-name"></div>
+
+    <div class="result-time-box hidden" id="result-time-box">
+      <div class="result-time-label" id="result-time-label">Hora de entrada</div>
+      <div class="result-time" id="result-time">--:--:--</div>
+      <div class="result-date" id="result-date"></div>
+    </div>
+
+    <div class="result-msg hidden" id="result-msg"></div>
+
+    <button class="result-btn" id="btn-result-primary">Escanear de nuevo</button>
+    <button class="result-btn ghost" id="btn-result-exit">Salir</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANTALLA 4: CARGANDO
+     ============================================================ -->
+<div id="screen-loading" class="screen hidden">
+  <div class="spinner"></div>
+  <div class="loading-text">Procesando...</div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIGURACION - REEMPLAZA CON TUS CREDENCIALES
+   ============================================================ */
+var SUPABASE_URL      = 'https://tecfkdgmfktbuylamljc.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRlY2ZrZGdtZmt0YnV5bGFtbGpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5ODE3MTQsImV4cCI6MjA3MTU1NzcxNH0.pa15Ctn-NaWtbplDZ4r35pxPD-4pA-7e0Q_WwVss9sg';
+
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+var state = {
+  numericInput: '',
+  employee: null,        // { id, code, numeric_code, full_name, position, department }
+  pointCodeFromUrl: null, // si viene ?point=XXX en la URL
+  scanner: null,         // instancia de Html5Qrcode
+  canScan: true,
+  isProcessing: false
+};
+
+var MAX_DIGITS = 10;
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+  bindPinPad();
+  bindOtherEvents();
+
+  // Si viene con ?point=XXX en la URL, guardarlo para cuando haga login
+  var params = new URLSearchParams(window.location.search);
+  var p = params.get('point');
+  if (p) state.pointCodeFromUrl = p.trim().toUpperCase();
+
+  showScreen('login');
+}
+
+/* ============================================================
+   PIN PAD
+   ============================================================ */
+function bindPinPad() {
+  var buttons = document.querySelectorAll('#pin-pad .pin-btn');
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener('click', function (e) {
+      var digit = e.currentTarget.getAttribute('data-digit');
+      var action = e.currentTarget.getAttribute('data-action');
+
+      if (action === 'del') {
+        deleteLastDigit();
+      } else if (action === 'ok') {
+        submitLogin();
+      } else if (digit !== null) {
+        addDigit(digit);
+      }
+    });
+  }
+
+  // Soporte teclado físico
+  document.addEventListener('keydown', function (e) {
+    if (!document.getElementById('screen-login').classList.contains('hidden')) {
+      if (e.key >= '0' && e.key <= '9') addDigit(e.key);
+      else if (e.key === 'Backspace') { e.preventDefault(); deleteLastDigit(); }
+      else if (e.key === 'Enter') submitLogin();
+    }
+  });
+}
+
+function addDigit(d) {
+  if (state.numericInput.length >= MAX_DIGITS) return;
+  if (state.isProcessing) return;
+  state.numericInput += d;
+  updatePinDisplay();
+}
+
+function deleteLastDigit() {
+  if (state.isProcessing) return;
+  state.numericInput = state.numericInput.slice(0, -1);
+  updatePinDisplay();
+}
+
+function updatePinDisplay() {
+  var display = document.getElementById('pin-display');
+  var okBtn = document.getElementById('pin-ok');
+
+  if (state.numericInput.length === 0) {
+    display.className = 'pin-display empty';
+    display.textContent = 'Ingresa tu codigo';
+    okBtn.disabled = true;
+  } else {
+    display.className = 'pin-display';
+    display.textContent = state.numericInput;
+    okBtn.disabled = false;
+  }
+
+  document.getElementById('login-error').textContent = '';
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+function submitLogin() {
+  if (state.isProcessing) return;
+  if (state.numericInput.length === 0) return;
+
+  var code = state.numericInput;
+  setProcessing(true);
+  clearLoginError();
+
+  sb.rpc('login_employee', { p_numeric_code: code }).then(function (res) {
+    setProcessing(false);
+
+    if (res.error) {
+      showLoginError('Error de conexion. Intenta de nuevo.');
+      return;
+    }
+    if (!res.data || res.data.error) {
+      showLoginError((res.data && res.data.error) || 'Codigo no valido.');
+      resetPinInput();
+      return;
+    }
+
+    // Login exitoso
+    state.employee = res.data;
+
+    // Si ya tenemos el punto por URL, marcar directo
+    if (state.pointCodeFromUrl) {
+      markAttendance(state.pointCodeFromUrl);
+    } else {
+      // Si no, abrir camara para escanear el QR de la pared
+      openCamera();
+    }
+  }).catch(function () {
+    setProcessing(false);
+    showLoginError('Error de conexion. Verifica tu internet.');
+  });
+}
+
+function resetPinInput() {
+  state.numericInput = '';
+  updatePinDisplay();
+}
+
+function setProcessing(on) {
+  state.isProcessing = on;
+  var display = document.getElementById('pin-display');
+  var buttons = document.querySelectorAll('#pin-pad .pin-btn');
+  for (var i = 0; i < buttons.length; i++) buttons[i].disabled = on;
+  if (on) {
+    display.className = 'pin-display empty';
+    display.textContent = 'Verificando...';
+  }
+}
+
+function showLoginError(msg) {
+  document.getElementById('login-error').textContent = msg;
+}
+
+function clearLoginError() {
+  document.getElementById('login-error').textContent = '';
+}
+
+/* ============================================================
+   CAMARA
+   ============================================================ */
+function openCamera() {
+  document.getElementById('camera-name').textContent = state.employee.full_name;
+  document.getElementById('camera-position').textContent =
+    (state.employee.position || 'Sin cargo') +
+    (state.employee.department ? ' - ' + state.employee.department : '');
+
+  showScreen('camera');
+
+  if (!state.scanner) {
+    state.scanner = new Html5Qrcode('reader');
+  }
+
+  state.canScan = true;
+
+  state.scanner.start(
+    { facingMode: 'environment' },
+    {
+      fps: 10,
+      qrbox: function (w, h) {
+        var s = Math.min(w, h) * 0.7;
+        return { width: s, height: s };
+      },
+      aspectRatio: 1.0
+    },
+    onScanSuccess,
+    function () { /* frames sin QR: ignorar */ }
+  ).catch(function (err) {
+    document.getElementById('camera-hint').textContent =
+      'No se pudo abrir la camara. Verifica los permisos del navegador.';
+  });
+}
+
+function closeCamera() {
+  if (!state.scanner) return Promise.resolve();
+  return state.scanner.stop().then(function () {
+    state.scanner.clear();
+  }).catch(function () {});
+}
+
+/* ============================================================
+   LECTURA DEL QR DE PARED
+   ============================================================ */
+function onScanSuccess(text) {
+  if (!state.canScan) return;
+  if (state.isProcessing) return;
+
+  state.canScan = false;
+  state.isProcessing = true;
+
+  var pointCode = extractPointCode(text);
+  if (!pointCode) {
+    state.isProcessing = false;
+    state.canScan = true;
+    document.getElementById('camera-hint').textContent =
+      'QR no reconocido. Apunta al QR de la entrada.';
+    return;
+  }
+
+  markAttendance(pointCode);
+}
+
+function extractPointCode(text) {
+  var t = (text || '').trim();
+  if (!t) return null;
+
+  // Caso 1: URL completa tipo http://.../scanner.html?point=SP-XXX
+  try {
+    var url = new URL(t);
+    var p = url.searchParams.get('point');
+    if (p) return p.trim().toUpperCase();
+  } catch (e) { /* no es URL */ }
+
+  // Caso 2: texto plano tipo "SP-ENTRADA-01"
+  if (/^[A-Z0-9\-]{2,64}$/i.test(t)) {
+    return t.toUpperCase();
+  }
+
+  // Caso 3: texto con ?point=XXX dentro
+  var match = t.match(/[?&]point=([^&\s]+)/);
+  if (match) return decodeURIComponent(match[1]).toUpperCase();
+
+  return null;
+}
+
+/* ============================================================
+   MARCAR ASISTENCIA
+   ============================================================ */
+function markAttendance(pointCode) {
+  showScreen('loading');
+
+  closeCamera().then(function () {
+    return sb.rpc('mark_attendance_by_numeric', {
+      p_numeric_code: state.employee.numeric_code,
+      p_scan_point_code: pointCode,
+      p_device_info: (navigator.userAgent || '').slice(0, 200)
+    });
+  }).then(function (res) {
+    state.isProcessing = false;
+
+    if (res.error) {
+      showErrorResult('Error de conexion: ' + res.error.message);
+      return;
+    }
+    if (!res.data || res.data.error) {
+      var msg = (res.data && res.data.error) || 'Error desconocido';
+      showErrorResult(msg);
+      return;
+    }
+
+    showSuccessResult(res.data);
+  }).catch(function () {
+    state.isProcessing = false;
+    showErrorResult('Error de conexion. Verifica tu internet.');
+  });
+}
+
+/* ============================================================
+   RESULTADO: EXITO
+   ============================================================ */
+function showSuccessResult(data) {
+  var rec = data.record;
+  var isIn = rec.type === 'in';
+  var emp = data.employee || state.employee;
+
+  var iconEl   = document.getElementById('result-icon');
+  var titleEl  = document.getElementById('result-title');
+  var nameEl   = document.getElementById('result-name');
+  var timeBox  = document.getElementById('result-time-box');
+  var timeLbl  = document.getElementById('result-time-label');
+  var timeEl   = document.getElementById('result-time');
+  var dateEl   = document.getElementById('result-date');
+  var msgEl    = document.getElementById('result-msg');
+
+  iconEl.className = 'result-icon ' + (isIn ? 'success' : 'out');
+  iconEl.innerHTML = isIn ? '&#10003;' : '&#8599;';
+
+  titleEl.textContent = isIn ? 'Entrada registrada' : 'Salida registrada';
+  nameEl.textContent  = 'Hola, ' + (emp.full_name || '');
+
+  timeLbl.textContent = isIn ? 'Hora de entrada' : 'Hora de salida';
+  timeEl.textContent  = rec.attendance_time || '--:--:--';
+  dateEl.textContent  = formatDate(rec.attendance_date);
+
+  timeBox.classList.remove('hidden');
+  msgEl.classList.add('hidden');
+
+  document.getElementById('btn-result-primary').textContent = 'Escanear de nuevo';
+  document.getElementById('btn-result-exit').classList.remove('hidden');
+
+  playBeep(880, 0.15);
+  showScreen('result');
+}
+
+/* ============================================================
+   RESULTADO: ERROR
+   ============================================================ */
+function showErrorResult(message) {
+  var iconEl   = document.getElementById('result-icon');
+  var titleEl  = document.getElementById('result-title');
+  var nameEl   = document.getElementById('result-name');
+  var timeBox  = document.getElementById('result-time-box');
+  var msgEl    = document.getElementById('result-msg');
+
+  iconEl.className = 'result-icon error';
+  iconEl.innerHTML = '&#10005;';
+
+  titleEl.textContent = 'No se pudo marcar';
+  nameEl.textContent  = state.employee ? state.employee.full_name : '';
+
+  timeBox.classList.add('hidden');
+  msgEl.classList.remove('hidden');
+  msgEl.textContent = message;
+
+  document.getElementById('btn-result-primary').textContent = 'Reintentar';
+  document.getElementById('btn-result-exit').classList.remove('hidden');
+
+  playBeep(220, 0.35);
+  showScreen('result');
+}
+
+/* ============================================================
+   NAVEGACION
+   ============================================================ */
+function showScreen(name) {
+  ['login', 'camera', 'result', 'loading'].forEach(function (s) {
+    document.getElementById('screen-' + s).classList.add('hidden');
+  });
+  document.getElementById('screen-' + name).classList.remove('hidden');
+
+  if (name === 'login') {
+    state.canScan = true;
+    state.isProcessing = false;
+    if (!state.employee) resetPinInput();
+  }
+}
+
+/* ============================================================
+   BOTONES SECUNDARIOS
+   ============================================================ */
+function bindOtherEvents() {
+  // Salir del scanner (logout)
+  document.getElementById('btn-logout').addEventListener('click', logout);
+
+  // Boton principal en pantalla resultado
+  document.getElementById('btn-result-primary').addEventListener('click', function () {
+    var primaryText = document.getElementById('btn-result-primary').textContent;
+    if (primaryText.indexOf('Reintentar') !== -1) {
+      // Reintentar = volver a la camara
+      state.isProcessing = false;
+      state.canScan = true;
+      openCamera();
+    } else {
+      // Escanear de nuevo
+      state.isProcessing = false;
+      state.canScan = true;
+      openCamera();
+    }
+  });
+
+  // Boton salir en pantalla resultado
+  document.getElementById('btn-result-exit').addEventListener('click', function () {
+    logout();
+  });
+}
+
+function logout() {
+  closeCamera().then(function () {
+    state.employee = null;
+    state.numericInput = '';
+    state.isProcessing = false;
+    state.canScan = true;
+    resetPinInput();
+    showScreen('login');
+  });
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+function formatDate(isoDate) {
+  if (!isoDate) return '';
+  var d = new Date(isoDate + 'T00:00:00');
+  var days = ['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+  var months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  return days[d.getDay()] + ', ' + d.getDate() + ' de ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+var audioCtxRef = null;
+function playBeep(freq, duration) {
+  try {
+    if (!audioCtxRef) {
+      audioCtxRef = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    var ctx = audioCtxRef;
+    if (ctx.state === 'suspended') ctx.resume();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) { /* audio no disponible */ }
+}
+</script>
+</body>
+</html>
