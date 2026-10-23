@@ -172,6 +172,14 @@
     }
     tbody tr:hover { background: var(--gray-50); }
     td code { background: var(--gray-100); padding: .12rem .4rem; border-radius: 4px; font-size: .78rem; }
+    td code.numeric {
+      background: #eff6ff;
+      color: #1e40af;
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: .05em;
+      padding: .2rem .5rem;
+    }
 
     .badge {
       display: inline-block; padding: .15rem .55rem; border-radius: 999px;
@@ -199,12 +207,32 @@
     .modal.open { display: flex; }
     .modal-content {
       background: #fff; border-radius: var(--radius); padding: 1.75rem;
-      max-width: 440px; width: 100%; text-align: center; box-shadow: var(--shadow-lg);
+      max-width: 460px; width: 100%; text-align: center; box-shadow: var(--shadow-lg);
       animation: pop .2s ease-out;
     }
     @keyframes pop { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .modal-content h3 { margin-bottom: .25rem; }
     .modal-content .sub { font-family: monospace; color: var(--gray-600); font-size: .8rem; margin-bottom: .5rem; }
+    .modal-content .numeric-badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: #1e40af;
+      padding: .5rem 1.5rem;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      margin-bottom: 1rem;
+    }
+    .modal-content .numeric-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--gray-600);
+      font-weight: 600;
+      margin-bottom: .35rem;
+    }
     #qrcode-container { display: flex; justify-content: center; margin: 1rem 0; }
     #qrcode-container canvas, #qrcode-container img { border-radius: 8px; }
     .modal-actions { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
@@ -212,6 +240,7 @@
     .empty { text-align: center; padding: 2rem; color: var(--gray-400); }
     .filters { display: flex; gap: .75rem; align-items: end; flex-wrap: wrap; margin-bottom: 1rem; }
     .filters .field { min-width: 170px; }
+
     .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; display: flex; flex-direction: column; gap: .5rem; }
     .toast {
       background: var(--gray-900); color: #fff; padding: .75rem 1.1rem;
@@ -232,6 +261,9 @@
 </head>
 <body>
 
+  <!-- ============================================================
+       PANTALLA DE AUTENTICACION
+       ============================================================ -->
   <div id="auth-screen" class="auth-screen">
     <div class="auth-card">
       <h1>Asistencia QR</h1>
@@ -288,6 +320,9 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       PANEL PRINCIPAL
+       ============================================================ -->
   <div id="app" class="hidden">
     <header class="app-header">
       <h1>Control de Asistencia QR</h1>
@@ -307,6 +342,7 @@
 
     <main class="container">
 
+      <!-- ============ TAB EMPLEADOS ============ -->
       <section id="tab-empleados">
         <div class="card">
           <h2>Registrar nuevo empleado</h2>
@@ -334,8 +370,11 @@
               </div>
             </div>
             <button type="submit" class="btn btn-primary" id="btn-add-employee">
-              Registrar y generar QR
+              Registrar empleado
             </button>
+            <p style="font-size:.78rem;color:var(--gray-600);margin-top:.5rem">
+              El codigo numerico se genera automaticamente (1001, 1002, ...).
+            </p>
           </form>
         </div>
 
@@ -352,38 +391,45 @@
             <table>
               <thead>
                 <tr>
-                  <th>Codigo</th><th>Nombre</th><th>Cargo</th><th>Departamento</th>
-                  <th>Estado</th><th>Acciones</th>
+                  <th>Codigo Numerico</th>
+                  <th>Codigo</th>
+                  <th>Nombre</th>
+                  <th>Cargo</th>
+                  <th>Departamento</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tbody-empleados">
-                <tr><td colspan="6" class="empty">Cargando...</td></tr>
+                <tr><td colspan="7" class="empty">Cargando...</td></tr>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
+      <!-- ============ TAB PUNTOS DE ESCANEO ============ -->
       <section id="tab-puntos" class="hidden">
         <div class="card">
           <h2>Nuevo punto de escaneo (QR de pared)</h2>
           <p style="color:var(--gray-600);font-size:.85rem;margin-bottom:1rem">
-            El QR se pega en la pared. Al escanearlo, se abre el escaner y el trabajador se identifica.
+            El QR se pega en la pared de la entrada. Los trabajadores lo escanean con su telefono
+            despues de ingresar su codigo numerico.
           </p>
           <form id="form-punto">
             <div class="form-grid">
               <div class="field">
                 <label>Nombre del punto *</label>
-                <input type="text" name="name" required placeholder="Puerta Principal">
+                <input type="text" name="name" required placeholder="Entrada Principal">
               </div>
               <div class="field">
                 <label>Codigo unico *</label>
-                <input type="text" name="code" required placeholder="SP-PUERTA-01"
+                <input type="text" name="code" required placeholder="SP-ENTRADA-01"
                        pattern="[A-Z0-9\-]{3,64}" title="Mayusculas, numeros y guiones">
               </div>
               <div class="field">
                 <label>Ubicacion</label>
-                <input type="text" name="location" placeholder="Edificio A, entrada">
+                <input type="text" name="location" placeholder="Edificio A, puerta principal">
               </div>
             </div>
             <button type="submit" class="btn btn-primary" id="btn-add-punto">
@@ -407,6 +453,7 @@
         </div>
       </section>
 
+      <!-- ============ TAB ASISTENCIA EN VIVO ============ -->
       <section id="tab-asistencia" class="hidden">
         <div class="summary" id="live-summary"></div>
         <div class="card">
@@ -420,17 +467,19 @@
             <table>
               <thead>
                 <tr>
-                  <th>Hora</th><th>Empleado</th><th>Cargo</th><th>Tipo</th><th>Punto</th>
+                  <th>Hora</th><th>Empleado</th><th>Codigo</th><th>Cargo</th>
+                  <th>Tipo</th><th>Punto</th>
                 </tr>
               </thead>
               <tbody id="tbody-live">
-                <tr><td colspan="5" class="empty">Esperando escaneos...</td></tr>
+                <tr><td colspan="6" class="empty">Esperando escaneos...</td></tr>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
+      <!-- ============ TAB REPORTES ============ -->
       <section id="tab-reportes" class="hidden">
         <div class="card">
           <h2>Reporte de asistencia / inasistencia</h2>
@@ -449,12 +498,12 @@
             <table>
               <thead>
                 <tr>
-                  <th>Empleado</th><th>Cargo</th><th>Departamento</th>
+                  <th>Codigo</th><th>Empleado</th><th>Cargo</th><th>Departamento</th>
                   <th>Estado</th><th>Entrada</th><th>Salida</th>
                 </tr>
               </thead>
               <tbody id="tbody-reporte">
-                <tr><td colspan="6" class="empty">Genera un reporte</td></tr>
+                <tr><td colspan="7" class="empty">Genera un reporte</td></tr>
               </tbody>
             </table>
           </div>
@@ -464,10 +513,19 @@
     </main>
   </div>
 
+  <!-- ============================================================
+       MODAL QR
+       ============================================================ -->
   <div class="modal" id="qr-modal">
     <div class="modal-content">
       <h3 id="qr-title">QR</h3>
       <div class="sub" id="qr-sub"></div>
+
+      <div id="qr-numeric-block" class="hidden">
+        <div class="numeric-label">Codigo numerico del empleado</div>
+        <div class="numeric-badge" id="qr-numeric"></div>
+      </div>
+
       <div id="qrcode-container"></div>
       <div class="modal-actions">
         <button class="btn btn-primary" id="btn-download-qr">Descargar QR</button>
@@ -498,7 +556,7 @@
     });
 
     /* ============================================================
-       ESTADO GLOBAL
+       ESTADO
        ============================================================ */
     var state = {
       user: null,
@@ -759,11 +817,12 @@
         phone:      (fd.get('phone') || '').trim() || null,
         code:       generateEmployeeCode(),
         token:      generateToken()
+        // numeric_code se genera automatico por el trigger de Supabase
       };
 
       sb.from('employees').insert(payload).select().single().then(function (res) {
         btn.disabled = false;
-        btn.textContent = 'Registrar y generar QR';
+        btn.textContent = 'Registrar empleado';
         if (res.error) { toast('Error: ' + res.error.message, 'error'); return; }
         e.target.reset();
         loadEmployees();
@@ -790,20 +849,23 @@
       var q = document.getElementById('search-empleado').value.toLowerCase().trim();
       var list = state.employees.filter(function (e) {
         if (!q) return true;
+        var num = (e.numeric_code || '').toLowerCase();
         return e.full_name.toLowerCase().indexOf(q) !== -1 ||
                e.code.toLowerCase().indexOf(q) !== -1 ||
+               num.indexOf(q) !== -1 ||
                (e.position || '').toLowerCase().indexOf(q) !== -1 ||
                (e.department || '').toLowerCase().indexOf(q) !== -1;
       });
 
       var tbody = document.getElementById('tbody-empleados');
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty">Sin empleados registrados.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">Sin empleados registrados.</td></tr>';
         return;
       }
 
       tbody.innerHTML = list.map(function (e) {
         return '<tr>' +
+          '<td><code class="numeric">' + (e.numeric_code || '-') + '</code></td>' +
           '<td><code>' + e.code + '</code></td>' +
           '<td><strong>' + escapeHtml(e.full_name) + '</strong></td>' +
           '<td>' + escapeHtml(e.position || '-') + '</td>' +
@@ -934,7 +996,7 @@
     function loadLiveAttendance() {
       var today = todayStr();
       return sb.from('attendance')
-        .select('id, type, attendance_date, attendance_time, marked_at, employees!inner(code, full_name, position, department), scan_points(name, location)')
+        .select('id, type, attendance_date, attendance_time, marked_at, employees!inner(code, numeric_code, full_name, position, department), scan_points(name, location)')
         .eq('attendance_date', today)
         .order('marked_at', { ascending: false })
         .limit(50)
@@ -949,7 +1011,7 @@
     function renderLiveAttendance() {
       var tbody = document.getElementById('tbody-live');
       if (!state.liveAttendance.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">Esperando escaneos...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Esperando escaneos...</td></tr>';
         return;
       }
       tbody.innerHTML = state.liveAttendance.map(function (r) {
@@ -958,6 +1020,7 @@
         return '<tr>' +
           '<td><code>' + r.attendance_time + '</code></td>' +
           '<td><strong>' + escapeHtml(emp.full_name || '-') + '</strong></td>' +
+          '<td><code class="numeric">' + escapeHtml(emp.numeric_code || '-') + '</code></td>' +
           '<td>' + escapeHtml(emp.position || '-') + '</td>' +
           '<td><span class="badge ' + (r.type === 'in' ? 'badge-in' : 'badge-out') + '">' +
             (r.type === 'in' ? 'Entrada' : 'Salida') + '</span></td>' +
@@ -1032,12 +1095,13 @@
 
       var tbody = document.getElementById('tbody-reporte');
       if (!state.reportData.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty">Sin empleados activos.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">Sin empleados activos.</td></tr>';
         return;
       }
 
       tbody.innerHTML = state.reportData.map(function (r) {
         return '<tr>' +
+          '<td><code class="numeric">' + escapeHtml(r.employee.numeric_code || '-') + '</code></td>' +
           '<td><strong>' + escapeHtml(r.employee.full_name) + '</strong></td>' +
           '<td>' + escapeHtml(r.employee.position || '-') + '</td>' +
           '<td>' + escapeHtml(r.employee.department || '-') + '</td>' +
@@ -1055,9 +1119,10 @@
         return;
       }
       var date = document.getElementById('report-date').value;
-      var rows = [['Codigo','Nombre','Cargo','Departamento','Estado','Entrada','Salida']];
+      var rows = [['Codigo Numerico','Codigo','Nombre','Cargo','Departamento','Estado','Entrada','Salida']];
       state.reportData.forEach(function (r) {
         rows.push([
+          r.employee.numeric_code || '',
           r.employee.code,
           r.employee.full_name,
           r.employee.position || '',
@@ -1126,7 +1191,16 @@
     function showQrModalEmployee(emp) {
       state.qrContext = { type: 'employee', data: emp };
       document.getElementById('qr-title').textContent = emp.full_name;
-      document.getElementById('qr-sub').textContent = emp.code + ' - ' + emp.token;
+      document.getElementById('qr-sub').textContent = emp.code;
+
+      var numBlock = document.getElementById('qr-numeric-block');
+      if (emp.numeric_code) {
+        numBlock.classList.remove('hidden');
+        document.getElementById('qr-numeric').textContent = emp.numeric_code;
+      } else {
+        numBlock.classList.add('hidden');
+      }
+
       renderQr(emp.token);
       document.getElementById('qr-modal').classList.add('open');
     }
@@ -1137,6 +1211,7 @@
       var scannerUrl = baseUrl + 'scanner.html?point=' + encodeURIComponent(point.code);
       document.getElementById('qr-title').textContent = point.name;
       document.getElementById('qr-sub').textContent = point.code;
+      document.getElementById('qr-numeric-block').classList.add('hidden');
       renderQr(scannerUrl);
       document.getElementById('qr-modal').classList.add('open');
     }
@@ -1168,7 +1243,7 @@
       var url = getQrDataUrl();
       if (!url || !state.qrContext) return;
       var name = state.qrContext.type === 'employee'
-        ? 'QR_' + state.qrContext.data.code + '.png'
+        ? 'QR_EMPLEADO_' + state.qrContext.data.code + '.png'
         : 'QR_PARED_' + state.qrContext.data.code + '.png';
       var a = document.createElement('a');
       a.href = url;
@@ -1186,8 +1261,9 @@
       var title = isPoint ? data.name : data.full_name;
       var subtitle = isPoint ? (data.location || data.code) : (data.position || data.code);
       var hint = isPoint
-        ? 'Escanea este codigo para marcar tu asistencia'
-        : 'Credencial personal - no compartir';
+        ? 'Apunta la camara a este codigo para marcar tu asistencia'
+        : 'Credencial del empleado';
+      var numericCode = (!isPoint && data.numeric_code) ? data.numeric_code : null;
 
       var w = window.open('', '_blank');
       if (!w) { toast('Permite las ventanas emergentes', 'error'); return; }
@@ -1197,21 +1273,30 @@
       html += '<style>';
       html += '@page { margin: 0; }';
       html += 'body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #fff; }';
-      html += '.poster { text-align: center; padding: 40px 50px; border: 3px solid #111827; border-radius: 20px; }';
+      html += '.poster { text-align: center; padding: 40px 50px; border: 3px solid #111827; border-radius: 20px; min-width: 400px; }';
       html += '.poster h1 { font-size: 26px; margin: 0 0 6px; }';
       html += '.poster p { color: #4b5563; margin: 0 0 22px; font-size: 15px; }';
       html += '.poster img { width: 320px; height: 320px; }';
       html += '.poster .hint { margin-top: 22px; font-size: 13px; color: #6b7280; }';
       html += '.poster .code { margin-top: 8px; font-family: monospace; font-size: 11px; color: #9ca3af; }';
+      html += '.poster .numeric { margin-top: 18px; padding: 12px 24px; background: #eff6ff; border-radius: 12px; display: inline-block; }';
+      html += '.poster .numeric-label { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #1e40af; font-weight: 700; margin-bottom: 4px; }';
+      html += '.poster .numeric-value { font-family: monospace; font-size: 28px; font-weight: 800; color: #1e40af; letter-spacing: .1em; }';
       html += '</style></head><body>';
       html += '<div class="poster">';
       html += '<h1>' + escapeHtml(title) + '</h1>';
       html += '<p>' + escapeHtml(subtitle || '') + '</p>';
       html += '<img src="' + url + '" alt="QR">';
       html += '<div class="hint">' + hint + '</div>';
-      html += '<div class="code">' + escapeHtml(data.code) + '</div>';
-      html += '</div>';
-      html += '</body></html>';
+      if (numericCode) {
+        html += '<div class="numeric">';
+        html += '<div class="numeric-label">Codigo numerico</div>';
+        html += '<div class="numeric-value">' + escapeHtml(numericCode) + '</div>';
+        html += '</div>';
+      } else {
+        html += '<div class="code">' + escapeHtml(data.code) + '</div>';
+      }
+      html += '</div></body></html>';
 
       w.document.open();
       w.document.write(html);
